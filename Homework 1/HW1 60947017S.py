@@ -18,21 +18,38 @@ window.configure(background='#3E4149')
 
 # upload image
 def upload():
+    # initialize two panel
+    panelA = None
+    panelB = None
     # ask open file
-    filename = filedialog.askopenfilename(title='open')
+    filename = filedialog.askopenfilename()
     # if file is exist
     if len(filename) > 0:
         # opencv read image
-        img = cv2.imread(filename)
-        # get image height and width
-        height, width, no_channels = img.shape
-        # create a canvas
-        canvas = Canvas(window, width = width, height = height)
-        # set canvas position
-        canvas.pack()
-        # set image in canvas
-        photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(img))
-        canvas.create_image(0, 0, image=photo, anchor=NW)
+        image = cv2.imread(filename)
+        image = PIL.Image.fromarray(image)
+        if panelA is None or panelB is None:
+            panelA = Label(image=image)
+            panelA.image = image
+            panelA.pack(side="left", padx=10, pady=10)
+
+            panelB = Label(image=image)
+            panelB.image = image
+            panelB.pack(side="right", padx=10, pady=10)
+        else:
+            panelA.configure(image=image)
+            panelB.configure(image=image)
+            panelA.image = image
+            panelB.image = image
+        # # get image height and width
+        # height, width, no_channels = img.shape
+        # # create a canvas
+        # canvas = Canvas(window, width = width, height = height)
+        # # set canvas position
+        # canvas.pack()
+        # # set image in canvas
+        # photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(img))
+        # canvas.create_image(0, 0, image=photo, anchor=NW)
 
 # main
 def main():
