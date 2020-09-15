@@ -1,2 +1,1 @@
-# AIP-Homework
-NTNU Advanced Image Processing Homework
+# Advanced Image Processing
