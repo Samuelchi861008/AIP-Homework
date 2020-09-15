@@ -27,7 +27,10 @@ def upload():
     if len(filename) > 0:
         # opencv read image
         image = cv2.imread(filename)
+        # convert image to PIL format
         image = PIL.Image.fromarray(image)
+        # convert image to ImageTk format
+        image = PIL.ImageTk.PhotoImage(image)
         if panelA is None or panelB is None:
             panelA = Label(image=image)
             panelA.image = image
@@ -41,15 +44,6 @@ def upload():
             panelB.configure(image=image)
             panelA.image = image
             panelB.image = image
-        # # get image height and width
-        # height, width, no_channels = img.shape
-        # # create a canvas
-        # canvas = Canvas(window, width = width, height = height)
-        # # set canvas position
-        # canvas.pack()
-        # # set image in canvas
-        # photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(img))
-        # canvas.create_image(0, 0, image=photo, anchor=NW)
 
 # main
 def main():
