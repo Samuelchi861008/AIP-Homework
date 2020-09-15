@@ -1,3 +1,7 @@
+# use python3.8
+# pip install Pillow
+# pip install opencv-python
+
 from tkinter import *
 from tkinter import filedialog
 import PIL.Image, PIL.ImageTk
