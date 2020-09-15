@@ -1,36 +1,45 @@
 from tkinter import *
 from tkinter import filedialog
-from PIL import Image, ImageTk
+import PIL.Image, PIL.ImageTk
 import cv2
 
-# 建立主視窗
+# create window
 window = Tk()
-# 設定視窗標題
+# set window title
 window.title('AIP 60947017S')
-# 設定視窗大小
+# set window size
 window.geometry('800x600')
-# 設定背景顏色
+# set window background color
 window.configure(background='#3E4149')
 
-# 圖片上傳
+# upload image
 def upload():
+    # ask open file
     filename = filedialog.askopenfilename(title='open')
-    img = Image.open(filename)
-    img = img.resize((250, 250), Image.ANTIALIAS)
-    img = ImageTk.PhotoImage(img)
-    panel = Label(window, image=img)
-    panel.image = img
-    panel.pack()
+    # if file is exist
+    if len(filename) > 0:
+        # opencv read image
+        img = cv2.imread(filename)
+        # get image height and width
+        height, width, no_channels = img.shape
+        # create a canvas
+        canvas = Canvas(window, width = width, height = height)
+        # set canvas position
+        canvas.pack()
+        # set image in canvas
+        photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(img))
+        canvas.create_image(0, 0, image=photo, anchor=NW)
 
-# 主程式
+# main
 def main():
-    # 建立按鈕 (按鈕所在視窗, 顯示文字, 按下按鈕所執行的函數)
-    button = Button(window, text = "上傳圖片", highlightbackground='#3E4149', command = upload)
-    # 以預設方式排版按鈕
+    # create button (window, text, background color, call function)
+    button = Button(window, text="上傳圖片", highlightbackground='#3E4149', command=upload)
+    # position
     button.pack(side=TOP)
-
-    # 運行主程式
+    # run window
     window.mainloop()
 
+
+# run main function
 if __name__ == '__main__':
     main()
