@@ -12,38 +12,44 @@ window = Tk()
 # set window title
 window.title('AIP 60947017S')
 # set window size
-window.geometry('800x600')
+window.geometry('1100x600')
 # set window background color
 window.configure(background='#3E4149')
 
 # upload image
 def upload():
     # initialize two panel
-    panelA = None
-    panelB = None
+    panel_Left = None
+    panel_Right = None
     # ask open file
     filename = filedialog.askopenfilename()
     # if file is exist
     if len(filename) > 0:
-        # opencv read image
-        image = cv2.imread(filename)
+        # opencv read image and convert from BGR to RGBA
+        image = cv2.cvtColor(cv2.imread(filename), cv2.COLOR_BGR2RGBA)
+        # resize image
+        image = cv2.resize(image, (512, 512), interpolation=cv2.INTER_CUBIC)
         # convert image to PIL format
         image = PIL.Image.fromarray(image)
         # convert image to ImageTk format
         image = PIL.ImageTk.PhotoImage(image)
-        if panelA is None or panelB is None:
-            panelA = Label(image=image)
-            panelA.image = image
-            panelA.pack(side="left", padx=10, pady=10)
-
-            panelB = Label(image=image)
-            panelB.image = image
-            panelB.pack(side="right", padx=10, pady=10)
+        # if one or more panel none
+        if panel_Left is None or panel_Right is None:
+            # set image in Left panel
+            panel_Left = Label(image=image)
+            panel_Left.image = image
+            panel_Left.pack(side="left", padx=10, pady=10)
+            
+            # set image in Right panel
+            panel_Right = Label(image=image)
+            panel_Right.image = image
+            panel_Right.pack(side="right", padx=10, pady=10)
         else:
-            panelA.configure(image=image)
-            panelB.configure(image=image)
-            panelA.image = image
-            panelB.image = image
+            # set image in two panel
+            panel_Left.configure(image=image)
+            panel_Right.configure(image=image)
+            panel_Left.image = image
+            panel_Right.image = image
 
 # main
 def main():
