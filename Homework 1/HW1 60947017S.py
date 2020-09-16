@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 # use python3.8
 # pip install Pillow
 # pip install opencv-python
@@ -15,12 +16,18 @@ window.title('AIP 60947017S')
 window.geometry('1100x600')
 # set window background color
 window.configure(background='#3E4149')
+# set window resize false
+window.resizable(width=False, height=False)
+
+# initialize two panel
+panel_Left = None
+panel_Right = None
 
 # upload image
 def upload():
-    # initialize two panel
-    panel_Left = None
-    panel_Right = None
+    # declare two panel
+    global panel_Left
+    global panel_Right
     # ask open file
     filename = filedialog.askopenfilename()
     # if file is exist
@@ -34,7 +41,7 @@ def upload():
         # convert image to ImageTk format
         image = PIL.ImageTk.PhotoImage(image)
         # if one or more panel none
-        if panel_Left is None or panel_Right is None:
+        if panel_Left == None and panel_Right == None:
             # set image in Left panel
             panel_Left = Label(image=image)
             panel_Left.image = image
@@ -45,6 +52,7 @@ def upload():
             panel_Right.image = image
             panel_Right.pack(side="right", padx=10, pady=10)
         else:
+            print("123")
             # set image in two panel
             panel_Left.configure(image=image)
             panel_Right.configure(image=image)
