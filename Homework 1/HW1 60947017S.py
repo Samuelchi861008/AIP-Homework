@@ -80,8 +80,8 @@ def main():
     button_choise = Button(window, text="選擇影像", highlightbackground='#3E4149', command=upload)
     # button_save = Button(window, text="儲存影像", highlightbackground='#3E4149', command=upload)
     # position
-    button_choise.pack(side=TOP, pady=30)
-    # button_save.pack(side=TOP, pady=30)
+    button_choise.pack(side=LEFT, pady=30)
+    # button_save.pack(side=LEFT, pady=30)
     # run window
     window.mainloop()
 
