@@ -1,19 +1,24 @@
 # -*- coding: UTF-8 -*-
-# use python3.8
+# use python3
 # pip install Pillow
 # pip install opencv-python
 
 from tkinter import *
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import PIL.Image, PIL.ImageTk
 import cv2
+import os
+
+# initialize window size
+width = 1270
+height = 700
 
 # create window
 window = Tk()
 # set window title
 window.title('AIP 60947017S')
 # set window size
-window.geometry('1100x600')
+window.geometry('%dx%d+%d+%d' % (width, height, (window.winfo_screenwidth() - width)/2, (window.winfo_screenheight() - height)/2))
 # set window background color
 window.configure(background='#3E4149')
 # set window resize false
@@ -40,6 +45,15 @@ def upload():
         image = PIL.Image.fromarray(image)
         # convert image to ImageTk format
         image = PIL.ImageTk.PhotoImage(image)
+
+        # set Text
+        text_before = Label(window, text = "輸入影像", bg="#3E4149", fg="green")
+        text_before.pack(side="left", padx=10)
+        text_before.config(font =("Courier", 18)) 
+        text_after = Label(window, text = "輸出影像", bg="#3E4149", fg="red")
+        text_after.pack(side="right", padx=10)
+        text_after.config(font =("Courier", 18))
+        
         # if one or more panel none
         if panel_Left == None and panel_Right == None:
             # set image in Left panel
@@ -57,13 +71,17 @@ def upload():
             panel_Right.configure(image=image)
             panel_Left.image = image
             panel_Right.image = image
+        # show messagebox
+        messagebox.showinfo( "提醒", "已上傳 " + os.path.splitext(filename)[-1] + " 檔案")
 
 # main
 def main():
     # create button (window, text, background color, call function)
-    button = Button(window, text="上傳圖片", highlightbackground='#3E4149', command=upload)
+    button_choise = Button(window, text="選擇影像", highlightbackground='#3E4149', command=upload)
+    # button_save = Button(window, text="儲存影像", highlightbackground='#3E4149', command=upload)
     # position
-    button.pack(side=TOP)
+    button_choise.pack(side=TOP, pady=30)
+    # button_save.pack(side=TOP, pady=30)
     # run window
     window.mainloop()
 
