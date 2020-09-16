@@ -52,7 +52,6 @@ def upload():
             panel_Right.image = image
             panel_Right.pack(side="right", padx=10, pady=10)
         else:
-            print("123")
             # set image in two panel
             panel_Left.configure(image=image)
             panel_Right.configure(image=image)
