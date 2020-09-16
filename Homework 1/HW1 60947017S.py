@@ -10,8 +10,8 @@ import cv2
 import os
 
 # initialize window size
-width = 1270
-height = 700
+width = 1280
+height = 600
 
 # create window
 window = Tk()
@@ -40,7 +40,7 @@ def upload():
         # opencv read image and convert from BGR to RGBA
         image = cv2.cvtColor(cv2.imread(filename), cv2.COLOR_BGR2RGBA)
         # resize image
-        image = cv2.resize(image, (512, 512), interpolation=cv2.INTER_CUBIC)
+        image = cv2.resize(image, (480, 480), interpolation=cv2.INTER_CUBIC)
         # convert image to PIL format
         image = PIL.Image.fromarray(image)
         # convert image to ImageTk format
@@ -76,12 +76,15 @@ def upload():
 
 # main
 def main():
-    # create button (window, text, background color, call function)
-    button_choise = Button(window, text="選擇影像", highlightbackground='#3E4149', command=upload)
-    # button_save = Button(window, text="儲存影像", highlightbackground='#3E4149', command=upload)
+    # create frame
+    frame =Frame(window, background='#3E4149')
+    frame.pack()
+    # create button (frame, text, background color, call function)
+    button_choise = Button(frame, text="選擇影像", highlightbackground='#3E4149', command=upload)
+    button_save = Button(frame, text="儲存影像", highlightbackground='#3E4149', command=upload)
     # position
-    button_choise.pack(side=TOP, pady=30)
-    # button_save.pack(side=LEFT, pady=30)
+    button_choise.grid(row=1, column=1, pady=20)
+    button_save.grid(row=1, column=2, pady=20)
     # run window
     window.mainloop()
 
