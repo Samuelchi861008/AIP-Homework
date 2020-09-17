@@ -14,12 +14,6 @@ import os
 width = 1280
 height = 600
 
-
-# initialize two panel
-panel_Left = None
-panel_Right = None
-
-
 # create window
 window = Tk()
 # set window title
@@ -32,83 +26,95 @@ window.configure(background='#3E4149')
 window.resizable(width=False, height=False)
 
 
-# image read by openCV
-def imageRead(filename):
-    # opencv read image and convert from BGR to RGBA
-    image = cv2.cvtColor(cv2.imread(filename), cv2.COLOR_BGR2RGBA)
-    # resize image
-    image = cv2.resize(image, (480, 480), interpolation=cv2.INTER_CUBIC)
-    return image
+# image processing class
+class ImgProcessing:
+    # constructor
+    def __init__(self):
+        # initialize two panel
+        self.panel_Left = None
+        self.panel_Right = None
+        self.filename = None
+        self.image = None
 
+    # set Left Image
+    def setLeftImage(self, image):
+        # convert color then resize image
+        image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA), 480, 480)
+        # convert image to PIL then convert to ImageTk format
+        image = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
+        # if panel is none
+        if self.panel_Left == None:
+            # set image in Left panel
+            self.panel_Left = Label(image=image)
+            self.panel_Left.image = image
+            self.panel_Left.pack(side="left", padx=10, pady=10)
+        else:
+            # set image in panel
+            self.panel_Left.configure(image=image)
+            self.panel_Left.image = image
 
-# set Left Image
-def setLeftImage(image):
-    # declare panel
-    global panel_Left
-    # if panel is none
-    if panel_Left == None:
-        # set image in Left panel
-        panel_Left = Label(image=image)
-        panel_Left.image = image
-        panel_Left.pack(side="left", padx=10, pady=10)
-    else:
-         # set image in panel
-        panel_Left.configure(image=image)
-        panel_Left.image = image
+    # set Right Image
+    def setRightImage(self, image):
+        # set image for download
+        self.image = image
+        # convert color then resize image
+        image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA), 480, 480)
+        # convert image to PIL then convert to ImageTk format
+        image = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
+        if self.panel_Right == None:
+            # set image in Right panel
+            self.panel_Right = Label(image=image)
+            self.panel_Right.image = image
+            self.panel_Right.pack(side="right", padx=10, pady=10)
+        else:
+            # set image in two panel
+            self.panel_Right.configure(image=image)
+            self.panel_Right.image = image
+        # set panel click event
+        self.panel_Right.bind("<Button-1>", self.download)
 
+    # upload image
+    def upload(self):
+        # ask open file
+        self.filename = filedialog.askopenfilename()
+        # if file is exist
+        if len(self.filename) > 0:
+            # image read by openCV
+            image = cv2.imread(self.filename)
+            # set two panel image
+            self.setLeftImage(image)
+            self.setRightImage(image)
+            # show messagebox
+            messagebox.showinfo("提醒", "已上傳 " + os.path.splitext(self.filename)[-1] + " 檔案")
 
-# set Right Image
-def setRightImage(image):
-    # declare panel
-    global panel_Right
-    if panel_Right == None:
-        # set image in Right panel
-        panel_Right = Label(image=image)
-        panel_Right.image = image
-        panel_Right.pack(side="right", padx=10, pady=10)
-    else:
-        # set image in two panel
-        panel_Left.configure(image=image)
-        panel_Right.configure(image=image)
-        panel_Left.image = image
-        panel_Right.image = image
-    # panel_Right.bind("<Button-1>", download)
-
-
-# upload image
-def upload():
-    # ask open file
-    filename = filedialog.askopenfilename()
-    # if file is exist
-    if len(filename) > 0:
-        # image read by openCV
-        image = imageRead(filename)
-
-        # convert image to PIL format
-        image = PIL.Image.fromarray(image)
-        # convert image to ImageTk format
-        image = PIL.ImageTk.PhotoImage(image)
-        
-        # set Image
-        setLeftImage(image)
-        setRightImage(image)
-
+    # download image
+    def download(self, event):
+        # image write
+        cv2.imwrite('output.jpg', self.image)
         # show messagebox
-        messagebox.showinfo("提醒", "已上傳 " + os.path.splitext(filename)[-1] + " 檔案")
+        messagebox.showinfo("提醒", "已下載 .jpg 檔案")
+    
+    # image resize
+    def resize(self, image, width, height):
+        # opencv resize image
+        image = cv2.resize(image, (width, height), interpolation=cv2.INTER_CUBIC)
+        return image
 
+    # image convert color by openCV
+    def convertColor(self, image, event):
+        # opencv convert image color
+        image = cv2.cvtColor(image, event)
+        return image
 
-def download(event):
-    print(event)
-    # 寫入圖檔
-    # cv2.imwrite('output.jpg', image)
 
 # main
 def main():
+    imgProcessing = ImgProcessing()
     # create frame
     frame =Frame(window, background='#3E4149')
     frame.pack()
     # create button (frame, text, background color, call function)
-    button_choise = Button(frame, text="選擇影像", highlightbackground='#3E4149', command=upload)
+    button_choise = Button(frame, text="選擇影像", highlightbackground='#3E4149', command=imgProcessing.upload)
     # position
     button_choise.grid(row=1, column=1, pady=20, padx=5)
     # set Text
