@@ -21,7 +21,7 @@ window.title('AIP 60947017S')
 # set window size
 window.geometry('%dx%d+%d+%d' % (width, height, (window.winfo_screenwidth() - width)/2, (window.winfo_screenheight() - height)/2))
 # set window background color
-window.configure(background='#3E4149')
+window.configure(background='#3248a8')
 # set window resize false
 window.resizable(width=False, height=False)
 
@@ -122,21 +122,21 @@ def main():
     # create object
     imgProcessing = ImgProcessing()
     # create frame for button
-    frame_button = Frame(window, background='#3E4149')
+    frame_button = Frame(window, background='#3248a8')
     frame_button.pack(side=TOP)
     # create frame for Text
-    frame_Text = Frame(window, background='#3E4149')
+    frame_Text = Frame(window, background='#3248a8')
     frame_Text.pack(side=BOTTOM)
     # create button (frame, text, background color, call function)
-    button_choise = Button(frame_button, text="選擇影像", highlightbackground='#3E4149', command=imgProcessing.upload)
+    button_choise = Button(frame_button, text="選擇影像", highlightbackground='#3248a8', command=imgProcessing.upload)
     # position
     button_choise.grid(row=1, column=1, pady=20, padx=5)
     # set Text
-    text_before = Label(frame_Text, text = "輸入影像", bg="#3E4149", fg="green")
+    text_before = Label(frame_Text, text = "輸入影像", bg="#3248a8", fg="green")
     text_before.grid(row=1, column=1, padx=210, pady=10)
     text_before.config(font=("Courier", 18)) 
 
-    text_after = Label(frame_Text, text = "輸出影像", bg="#3E4149", fg="red")
+    text_after = Label(frame_Text, text = "輸出影像", bg="#3248a8", fg="red")
     text_after.grid(row=1, column=2, padx=280, pady=10)
     text_after.config(font=("Courier", 18))
     # run window
