@@ -33,7 +33,7 @@ class ImgProcessing:
         # initialize two panel
         self.panel_Left = None
         self.panel_Right = None
-        self.filename = None
+        self.imgPath = None
         self.image = None
 
     # set Left Image
@@ -76,23 +76,25 @@ class ImgProcessing:
     # upload image
     def upload(self):
         # ask open file
-        self.filename = filedialog.askopenfilename()
+        self.imgPath = filedialog.askopenfilename()
         # if file is exist
-        if len(self.filename) > 0:
+        if len(self.imgPath) > 0:
             # image read by openCV
-            image = cv2.imread(self.filename)
+            image = cv2.imread(self.imgPath)
             # set two panel image
             self.setLeftImage(image)
             self.setRightImage(image)
             # show messagebox
-            messagebox.showinfo("提醒", "已上傳 " + os.path.splitext(self.filename)[-1] + " 檔案")
+            messagebox.showinfo("提醒", "已上傳 " + os.path.splitext(self.imgPath)[-1] + " 檔案")
 
     # download image
     def download(self, event):
+        # ask save file name
+        saveFileName = filedialog.asksaveasfilename()
         # image write
-        cv2.imwrite('output.jpg', self.image)
+        cv2.imwrite(saveFileName, self.image)
         # show messagebox
-        messagebox.showinfo("提醒", "已下載 .jpg 檔案")
+        messagebox.showinfo("提醒", "已下載 " + os.path.splitext(saveFileName)[-1] + " 檔案")
     
     # image resize
     def resize(self, image, width, height):
