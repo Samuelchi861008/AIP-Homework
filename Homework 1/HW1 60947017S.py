@@ -12,7 +12,7 @@ import os
 
 # initialize window size
 width = 1045
-height = 615
+height = 625
 
 # create window
 window = Tk()
