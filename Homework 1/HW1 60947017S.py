@@ -133,7 +133,7 @@ def main():
     button_choise.grid(row=1, column=1, pady=20, padx=5)
     # set Text
     text_before = Label(frame_Text, text = "輸入影像", bg="#3248a8", fg="green")
-    text_before.grid(row=1, column=1, padx=210, pady=10)
+    text_before.grid(row=1, column=1, padx=200, pady=10)
     text_before.config(font=("Courier", 18)) 
 
     text_after = Label(frame_Text, text = "輸出影像", bg="#3248a8", fg="red")
