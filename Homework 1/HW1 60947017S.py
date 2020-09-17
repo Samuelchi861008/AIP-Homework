@@ -111,9 +111,10 @@ class ImgProcessing:
 
 # main
 def main():
+    # create object
     imgProcessing = ImgProcessing()
     # create frame
-    frame =Frame(window, background='#3E4149')
+    frame = Frame(window, background='#3E4149')
     frame.pack()
     # create button (frame, text, background color, call function)
     button_choise = Button(frame, text="選擇影像", highlightbackground='#3E4149', command=imgProcessing.upload)
@@ -122,11 +123,11 @@ def main():
     # set Text
     text_before = Label(window, text = "輸入影像", bg="#3E4149", fg="green")
     text_before.pack(side="left", padx=10)
-    text_before.config(font =("Courier", 18)) 
+    text_before.config(font=("Courier", 18)) 
 
     text_after = Label(window, text = "輸出影像", bg="#3E4149", fg="red")
     text_after.pack(side="right", padx=10)
-    text_after.config(font =("Courier", 18))
+    text_after.config(font=("Courier", 18))
     # run window
     window.mainloop()
 
