@@ -30,7 +30,7 @@ window.resizable(width=False, height=False)
 class ImgProcessing:
     # constructor
     def __init__(self):
-        # initialize two panel
+        # data field
         self.panel_Left = None
         self.panel_Right = None
         self.imgPath = None
