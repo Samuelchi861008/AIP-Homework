@@ -11,8 +11,8 @@ import os
 
 
 # initialize window size
-width = 1280
-height = 600
+width = 1045
+height = 615
 
 # create window
 window = Tk()
@@ -77,8 +77,11 @@ class ImgProcessing:
     def upload(self):
         # ask open file
         self.imgPath = filedialog.askopenfilename()
-        # if file is exist
-        if len(self.imgPath) > 0:
+        # if file is exist and not gif
+        if len(self.imgPath) > 0 and os.path.splitext(self.imgPath)[-1].upper() == ".GIF":
+            # show messagebox
+            messagebox.showinfo("警告", "不可選擇 .gif 檔")
+        elif len(self.imgPath) > 0:
             # image read by openCV
             image = cv2.imread(self.imgPath)
             # set two panel image
@@ -91,10 +94,15 @@ class ImgProcessing:
     def download(self, event):
         # ask save file name
         saveFileName = filedialog.asksaveasfilename()
-        # image write
-        cv2.imwrite(saveFileName, self.image)
-        # show messagebox
-        messagebox.showinfo("提醒", "已下載 " + os.path.splitext(saveFileName)[-1] + " 檔案")
+        # if file isn't gif
+        if len(saveFileName) > 0 and os.path.splitext(saveFileName)[-1].upper() == ".GIF":
+            # show messagebox
+            messagebox.showinfo("警告", "不可儲存 .gif 檔")
+        elif len(saveFileName) > 0:
+            # image write
+            cv2.imwrite(saveFileName, self.image)
+            # show messagebox
+            messagebox.showinfo("提醒", "已下載 " + os.path.splitext(saveFileName)[-1] + " 檔案")
     
     # image resize
     def resize(self, image, width, height):
@@ -113,20 +121,23 @@ class ImgProcessing:
 def main():
     # create object
     imgProcessing = ImgProcessing()
-    # create frame
-    frame = Frame(window, background='#3E4149')
-    frame.pack()
+    # create frame for button
+    frame_button = Frame(window, background='#3E4149')
+    frame_button.pack(side=TOP)
+    # create frame for Text
+    frame_Text = Frame(window, background='#3E4149')
+    frame_Text.pack(side=BOTTOM)
     # create button (frame, text, background color, call function)
-    button_choise = Button(frame, text="選擇影像", highlightbackground='#3E4149', command=imgProcessing.upload)
+    button_choise = Button(frame_button, text="選擇影像", highlightbackground='#3E4149', command=imgProcessing.upload)
     # position
     button_choise.grid(row=1, column=1, pady=20, padx=5)
     # set Text
-    text_before = Label(window, text = "輸入影像", bg="#3E4149", fg="green")
-    text_before.pack(side="left", padx=10)
+    text_before = Label(frame_Text, text = "輸入影像", bg="#3E4149", fg="green")
+    text_before.grid(row=1, column=1, padx=210, pady=10)
     text_before.config(font=("Courier", 18)) 
 
-    text_after = Label(window, text = "輸出影像", bg="#3E4149", fg="red")
-    text_after.pack(side="right", padx=10)
+    text_after = Label(frame_Text, text = "輸出影像", bg="#3E4149", fg="red")
+    text_after.grid(row=1, column=2, padx=280, pady=10)
     text_after.config(font=("Courier", 18))
     # run window
     window.mainloop()
