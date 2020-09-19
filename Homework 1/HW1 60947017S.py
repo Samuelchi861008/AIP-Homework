@@ -93,7 +93,7 @@ class ImgProcessing:
     # download image
     def download(self, event):
         # ask save file name
-        saveFileName = filedialog.asksaveasfilename(filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+        saveFileName = filedialog.asksaveasfilename()
         # if file isn't gif
         if len(saveFileName) > 0 and os.path.splitext(saveFileName)[-1].upper() == ".GIF":
             # show messagebox
