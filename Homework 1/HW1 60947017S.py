@@ -105,7 +105,7 @@ class ImgProcessing:
             # image write
             cv2.imwrite(saveFileName, self.image)
             # show messagebox
-            messagebox.showinfo("提醒", "已下載 " + os.path.splitext(saveFileName)[-1] + " 檔案\n大小為 " + str(self.size[0:2]))
+            messagebox.showinfo("提醒", "已下載 " + os.path.splitext(saveFileName)[-1] + " 檔案\n大小為 " + str(cv2.imread(saveFileName).shape[0:2]))
     
     # image resize
     def resize(self, image, width, height):
