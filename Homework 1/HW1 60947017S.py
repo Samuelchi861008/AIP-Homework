@@ -3,6 +3,7 @@
 # pip install Pillow
 # pip install opencv-python
 
+import numpy as np
 from tkinter import *
 from tkinter import filedialog, messagebox
 import PIL.Image, PIL.ImageTk
@@ -78,34 +79,36 @@ class ImgProcessing:
     def upload(self):
         # ask open file
         self.imgPath = filedialog.askopenfilename()
+        extensionFileName = os.path.splitext(self.imgPath)[-1].upper()
         # if file is exist and not gif
-        if len(self.imgPath) > 0 and os.path.splitext(self.imgPath)[-1].upper() == ".GIF":
+        if len(self.imgPath) > 0 and extensionFileName == ".GIF":
             # show messagebox
             messagebox.showinfo("警告", "不可選擇 .gif 檔")
         elif len(self.imgPath) > 0:
             # image read by openCV
-            image = cv2.imread(self.imgPath)
+            image = cv2.imdecode(np.fromfile(self.imgPath, dtype=np.uint8), 1)
             # get image size
             self.size = image.shape
             # set two panel image
             self.setLeftImage(image)
             self.setRightImage(image)
             # show messagebox
-            messagebox.showinfo("提醒", "已上傳 " + os.path.splitext(self.imgPath)[-1] + " 檔案\n大小為 " + str(self.size[0:2]))
+            messagebox.showinfo("提醒", "已上傳 " + extensionFileName + " 檔案\n大小為 " + str(self.size[0:2]))
 
     # download image
     def download(self, event):
         # ask save file name
         saveFileName = filedialog.asksaveasfilename()
+        extensionFileName = os.path.splitext(saveFileName)[-1].upper() if (os.path.splitext(saveFileName)[-1]) else ".JPG"
         # if file isn't gif
-        if len(saveFileName) > 0 and os.path.splitext(saveFileName)[-1].upper() == ".GIF":
+        if len(saveFileName) > 0 and extensionFileName == ".GIF":
             # show messagebox
             messagebox.showinfo("警告", "不可儲存 .gif 檔")
         elif len(saveFileName) > 0:
             # image write
-            cv2.imwrite(saveFileName, self.image)
+            cv2.imencode(extensionFileName, self.image)[1].tofile(saveFileName if (os.path.splitext(saveFileName)[-1]) else (saveFileName + extensionFileName))
             # show messagebox
-            messagebox.showinfo("提醒", "已下載 " + os.path.splitext(saveFileName)[-1] + " 檔案\n大小為 " + str(cv2.imread(saveFileName).shape[0:2]))
+            messagebox.showinfo("提醒", "已下載 " + extensionFileName + " 檔案\n大小為 " + str(cv2.imread(saveFileName if (os.path.splitext(saveFileName)[-1]) else (saveFileName + extensionFileName)).shape[0:2]))
     
     # image resize
     def resize(self, image, width, height):
