@@ -108,7 +108,7 @@ class ImgProcessing:
             # image write
             cv2.imencode(extensionFileName, self.image)[1].tofile(saveFileName if (os.path.splitext(saveFileName)[-1]) else (saveFileName + extensionFileName))
             # show messagebox
-            messagebox.showinfo("提醒", "已下載 " + extensionFileName + " 檔案\n大小為 " + str(cv2.imread(saveFileName if (os.path.splitext(saveFileName)[-1]) else (saveFileName + extensionFileName)).shape[0:2]))
+            messagebox.showinfo("提醒", "已下載 " + extensionFileName + " 檔案\n大小為 " + str(cv2.imdecode(np.fromfile(saveFileName if (os.path.splitext(saveFileName)[-1]) else (saveFileName + extensionFileName), dtype=np.uint8), 1).shape[0:2]))
     
     # image resize
     def resize(self, image, width, height):
