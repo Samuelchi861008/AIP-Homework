@@ -40,6 +40,7 @@ class ImgProcessing:
         self.image_Left = None
         self.image_Right = None
         self.size = None
+        self.canvas = None
 
     # set Left Image
     def setLeftImage(self, image, event):
@@ -64,7 +65,7 @@ class ImgProcessing:
     def setRightImage(self, image, event):
         # if not None clear Right panel
         if self.panel_Right != None:
-            FigureCanvasTkAgg(self.panel_Right, window).close_event() if isinstance(self.panel_Right, Figure) else self.panel_Right.destroy()
+            self.canvas.get_tk_widget().delete("all") if isinstance(self.panel_Right, Figure) else self.panel_Right.destroy()
         # set image for download
         self.image_Right = image
         # convert color then resize image
@@ -76,7 +77,8 @@ class ImgProcessing:
             # set Right panel plot
             self.panel_Right.add_subplot(111).plot(cv2.calcHist([image], [0], None, [256], [0, 256]))
             # set Right panel position
-            FigureCanvasTkAgg(self.panel_Right, window).get_tk_widget().pack(side="right", padx=10, pady=10)
+            self.canvas = FigureCanvasTkAgg(self.panel_Right, window)
+            self.canvas.get_tk_widget().pack(side="right", padx=10, pady=10)
         else:
             # convert image to PIL then convert to ImageTk format
             image = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
