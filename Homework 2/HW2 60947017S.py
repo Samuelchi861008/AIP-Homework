@@ -162,7 +162,7 @@ def main():
     button_histogram.grid(row=1, column=2, pady=20, padx=5)
     # set Text
     text_before = Label(frame_Text, text = "輸入影像", bg="#051636", fg="green")
-    text_before.grid(row=1, column=1, padx=200, pady=10)
+    text_before.grid(row=1, column=1, padx=195, pady=10)
     text_before.config(font=("Courier", 18)) 
 
     text_after = Label(frame_Text, text = "輸出影像", bg="#051636", fg="red")
