@@ -75,7 +75,9 @@ class ImgProcessing:
             # set Right panel is Figure
             self.panel_Right = Figure(figsize=(5, 4), dpi=100)
             # set Right panel plot
-            self.panel_Right.add_subplot(111).bar(range(1,257), [x[0] for x in iter(list(cv2.calcHist([image], [0], None, [256], [0, 256])))])
+            plot = self.panel_Right.add_subplot(111)
+            plot.title.set_text('Image Histogram')
+            plot.bar(range(1,257), [x[0] for x in iter(list(cv2.calcHist([image], [0], None, [256], [0, 256])))])
             # set canvas
             self.canvas = FigureCanvasTkAgg(self.panel_Right, window)
             # set canvas position
