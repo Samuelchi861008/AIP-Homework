@@ -73,7 +73,7 @@ class ImgProcessing:
         # if user want see histogram
         if event == "Histogram":
             # set Right panel is Figure
-            self.panel_Right = Figure(figsize=(5, 4), dpi=100)
+            self.panel_Right = Figure(figsize=(4.8, 4.8), dpi=100)
             # set Right panel plot
             plot = self.panel_Right.add_subplot(111)
             plot.title.set_text('Image Histogram')
