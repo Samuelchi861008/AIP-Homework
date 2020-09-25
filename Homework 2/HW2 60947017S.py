@@ -2,7 +2,7 @@
 # use python3
 # pip install Pillow
 # pip install opencv-python
-# pip install matplotlib
+# pip install matplotlib==3.1.1
 
 import numpy as np
 from tkinter import *
