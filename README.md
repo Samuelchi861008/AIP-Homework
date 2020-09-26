@@ -7,5 +7,8 @@
 |
 ├── Homework 1: read/write image files
 |
-└── Homework 2: Image histogram
+├── Homework 2: Image histogram
+|
+└── Homework 3: Generation of additive, zero mean Gaussian noise
+
 ```
