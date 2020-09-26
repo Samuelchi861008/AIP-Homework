@@ -18,6 +18,11 @@ import os
 width = 1045
 height = 625
 
+# initialize button
+# button_choise = None
+# button_histogram = None
+# button_gaussianNoise = None
+
 # create window
 window = Tk()
 # set window title
@@ -47,7 +52,8 @@ class ImgProcessing:
         # set image for download
         self.image_Left = image
         # convert color then resize image
-        image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA if event != "Gray" else cv2.COLOR_BGR2GRAY), 480, 480)
+        if event != "AlreadyGray":
+            image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA if event != "Gray" else cv2.COLOR_BGR2GRAY), 480, 480)
         # convert image to PIL then convert to ImageTk format
         image = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
         # if panel is none
@@ -69,9 +75,10 @@ class ImgProcessing:
         # set image for download
         self.image_Right = image
         # convert color then resize image
-        image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA if event != "Histogram" else cv2.COLOR_BGR2GRAY), 480, 480)
+        if event != "GaussianNoise":
+            image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA if event != "Histogram" else cv2.COLOR_BGR2GRAY), 480, 480)
         # if user want see histogram
-        if event == "Histogram":
+        if event == "Histogram" or event == "GaussianNoise":
             # set Right panel is Figure
             self.panel_Right = Figure(figsize=(4.8, 4.8), dpi=100)
             # set Right panel plot
@@ -94,6 +101,8 @@ class ImgProcessing:
 
     # upload image
     def upload(self):
+        # set button NORMAL
+        # button_histogram['state'] = NORMAL
         # ask open file
         self.imgPath = filedialog.askopenfilename()
         extensionFileName = os.path.splitext(self.imgPath)[-1].upper()
@@ -143,6 +152,44 @@ class ImgProcessing:
     def histogram(self):
         self.setLeftImage(self.image_Left, "Gray")
         self.setRightImage(self.image_Right, "Histogram")
+    
+    # gaussian noise
+    def gaussianNoise(self):
+        # set button DISABLED
+        # button_histogram['state'] = DISABLED
+        param = 20
+        grayscale = 256
+        image = self.resize(self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY), 480, 480)
+        newimg = np.zeros((480, 480), np.uint8)
+        for i in range(0, 480):
+            for j in range(0, 480, 2):
+                r1 = np.random.random_sample()
+                r2 = np.random.random_sample()
+                z1 = param * np.cos(2 * np.pi * r2) * np.sqrt((-2) * np.log(r1))
+                z2 = param * np.sin(2 * np.pi * r2) * np.sqrt((-2) * np.log(r1))
+
+                fxy = int(image[i, j] + z1)
+                fxy1 = int(image[i, j + 1] + z2)
+
+                if fxy < 0:
+                    fxy_val = 0
+                elif fxy > grayscale - 1:
+                    fxy_val = grayscale - 1
+                else:
+                    fxy_val = fxy
+
+                if fxy1 < 0:
+                    fxy1_val = 0
+                elif fxy1 > grayscale - 1:
+                    fxy1_val = grayscale - 1
+                else:
+                    fxy1_val = fxy1
+                
+                newimg[i, j] = fxy_val
+                newimg[i, j + 1] = fxy1_val
+        
+        self.setLeftImage(newimg, "AlreadyGray")
+        self.setRightImage(newimg, "GaussianNoise")
 
 # main
 def main():
@@ -157,9 +204,11 @@ def main():
     # create button (frame, text, background color, call function)
     button_choise = Button(frame_button, text="選擇影像", highlightbackground='#051636', command=imgProcessing.upload)
     button_histogram = Button(frame_button, text="直方圖", highlightbackground='#051636', command=imgProcessing.histogram)
+    button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.gaussianNoise)
     # position
     button_choise.grid(row=1, column=1, pady=20, padx=5)
     button_histogram.grid(row=1, column=2, pady=20, padx=5)
+    button_gaussianNoise.grid(row=1, column=3, pady=20, padx=5)
     # set Text
     text_before = Label(frame_Text, text = "輸入影像", bg="#051636", fg="green")
     text_before.grid(row=1, column=1, padx=195, pady=10)
