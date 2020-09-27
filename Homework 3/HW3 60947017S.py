@@ -18,11 +18,6 @@ import os
 width = 1045
 height = 625
 
-# initialize button
-# button_choise = None
-# button_histogram = None
-# button_gaussianNoise = None
-
 # create window
 window = Tk()
 # set window title
@@ -46,6 +41,9 @@ class ImgProcessing:
         self.image_Right = None
         self.size = None
         self.canvas = None
+        self.button_choise = None
+        self.button_histogram = None
+        self.button_gaussianNoise = None
 
     # set Left Image
     def setLeftImage(self, image, event):
@@ -101,8 +99,6 @@ class ImgProcessing:
 
     # upload image
     def upload(self):
-        # set button NORMAL
-        # button_histogram['state'] = NORMAL
         # ask open file
         self.imgPath = filedialog.askopenfilename()
         extensionFileName = os.path.splitext(self.imgPath)[-1].upper()
@@ -111,6 +107,10 @@ class ImgProcessing:
             # show messagebox
             messagebox.showinfo("警告", "不可選擇 .gif 檔")
         elif len(self.imgPath) > 0:
+            # set button normal
+            self.button_histogram['state'] = NORMAL
+            # set button normal
+            self.button_gaussianNoise['state'] = NORMAL
             # image read by openCV
             image = cv2.imdecode(np.fromfile(self.imgPath, dtype=np.uint8), 1)
             # get image size
@@ -150,13 +150,19 @@ class ImgProcessing:
 
     # draw histogram
     def histogram(self):
+        # set button disabled
+        self.button_histogram['state'] = DISABLED
+        self.button_gaussianNoise['state'] = DISABLED
+        # set left image
         self.setLeftImage(self.image_Left, "Gray")
+        # set right image
         self.setRightImage(self.image_Right, "Histogram")
     
     # gaussian noise
     def gaussianNoise(self):
-        # set button DISABLED
-        # button_histogram['state'] = DISABLED
+        # set button disabled
+        self.button_histogram['state'] = DISABLED
+        self.button_gaussianNoise['state'] = DISABLED
         param = 20
         grayscale = 256
         image = self.resize(self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY), 480, 480)
@@ -202,13 +208,13 @@ def main():
     frame_Text = Frame(window, background='#051636')
     frame_Text.pack(side=BOTTOM)
     # create button (frame, text, background color, call function)
-    button_choise = Button(frame_button, text="選擇影像", highlightbackground='#051636', command=imgProcessing.upload)
-    button_histogram = Button(frame_button, text="直方圖", highlightbackground='#051636', command=imgProcessing.histogram)
-    button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.gaussianNoise)
+    imgProcessing.button_choise = Button(frame_button, text="選擇影像", highlightbackground='#051636', command=imgProcessing.upload)
+    imgProcessing.button_histogram = Button(frame_button, text="直方圖", highlightbackground='#051636', command=imgProcessing.histogram, state="disabled")
+    imgProcessing.button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.gaussianNoise, state="disabled")
     # position
-    button_choise.grid(row=1, column=1, pady=20, padx=5)
-    button_histogram.grid(row=1, column=2, pady=20, padx=5)
-    button_gaussianNoise.grid(row=1, column=3, pady=20, padx=5)
+    imgProcessing.button_choise.grid(row=1, column=1, pady=20, padx=5)
+    imgProcessing.button_histogram.grid(row=1, column=2, pady=20, padx=5)
+    imgProcessing.button_gaussianNoise.grid(row=1, column=3, pady=20, padx=5)
     # set Text
     text_before = Label(frame_Text, text = "輸入影像", bg="#051636", fg="green")
     text_before.grid(row=1, column=1, padx=195, pady=10)
