@@ -163,38 +163,46 @@ class ImgProcessing:
         # set button disabled
         self.button_histogram['state'] = DISABLED
         self.button_gaussianNoise['state'] = DISABLED
-        param = 20
+        # range of grayscale
         grayscale = 256
+        # initialize a value, if low value generate less noise
+        param = 20
+        # convert image to gray then resize it
         image = self.resize(self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY), 480, 480)
+        # initialize a array then filled with zero
         newimg = np.zeros((480, 480), np.uint8)
+        # use nested loops read image every pixel
         for i in range(0, 480):
             for j in range(0, 480, 2):
+                # generate two random number
                 r1 = np.random.random_sample()
                 r2 = np.random.random_sample()
+                # calculate z1 and z2
                 z1 = param * np.cos(2 * np.pi * r2) * np.sqrt((-2) * np.log(r1))
                 z2 = param * np.sin(2 * np.pi * r2) * np.sqrt((-2) * np.log(r1))
-
+                # calculate f'(x,y) and f'(x,y+1)
                 fxy = int(image[i, j] + z1)
                 fxy1 = int(image[i, j + 1] + z2)
-
+                # condition for f(x,y)
                 if fxy < 0:
                     fxy_val = 0
                 elif fxy > grayscale - 1:
                     fxy_val = grayscale - 1
                 else:
                     fxy_val = fxy
-
+                # condition for f(x,y+1)
                 if fxy1 < 0:
                     fxy1_val = 0
                 elif fxy1 > grayscale - 1:
                     fxy1_val = grayscale - 1
                 else:
                     fxy1_val = fxy1
-                
+                # set two values in new image
                 newimg[i, j] = fxy_val
                 newimg[i, j + 1] = fxy1_val
-        
+        # set left image
         self.setLeftImage(newimg, "AlreadyGray")
+        # set right image
         self.setRightImage(newimg, "GaussianNoise")
 
 # main
@@ -207,7 +215,7 @@ def main():
     # create frame for Text
     frame_Text = Frame(window, background='#051636')
     frame_Text.pack(side=BOTTOM)
-    # create button (frame, text, background color, call function)
+    # create button (frame, text, background color, call function, state)
     imgProcessing.button_choise = Button(frame_button, text="選擇影像", highlightbackground='#051636', command=imgProcessing.upload)
     imgProcessing.button_histogram = Button(frame_button, text="直方圖", highlightbackground='#051636', command=imgProcessing.histogram, state="disabled")
     imgProcessing.button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.gaussianNoise, state="disabled")
