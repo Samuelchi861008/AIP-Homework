@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 # use python3
+# pip install numpy
 # pip install Pillow
 # pip install opencv-python
 # pip install matplotlib==3.1.1
@@ -50,7 +51,7 @@ class Dialog:
         self.myLabel.pack()
         # input box
         self.myEntryBox = Entry(self.top, highlightbackground='#39393a')
-        self.myEntryBox.pack()
+        self.myEntryBox.pack(pady=5)
         # submit button
         self.mySubmitButton = Button(self.top, text='確定', command=self.send, highlightbackground='#39393a')
         self.mySubmitButton.pack()
