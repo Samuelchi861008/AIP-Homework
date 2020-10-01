@@ -29,6 +29,40 @@ window.configure(background='#051636')
 # set window resize false
 window.resizable(width=False, height=False)
 
+# dialog class
+class Dialog:
+    # constructor (parent window, question)
+    def __init__(self, parent, text):
+        # answer
+        self.ans = None
+        # set dialog width
+        self.dialogWidth = 500
+        # set dialog height
+        self.dialogHeight = 100
+        # set dialog
+        self.top = Toplevel(parent)
+        self.top.protocol("WM_DELETE_WINDOW", self.clickCloseButton)
+        self.top.geometry('%dx%d+%d+%d' % (self.dialogWidth, self.dialogHeight, (window.winfo_screenwidth() - self.dialogWidth)/2, (window.winfo_screenheight() - self.dialogHeight)/2))
+        self.top.configure(background='#39393a')
+        self.top.resizable(width=False, height=False)
+        # question label
+        self.myLabel = Label(self.top, text=text, fg='#ffffff', bg='#39393a')
+        self.myLabel.pack()
+        # input box
+        self.myEntryBox = Entry(self.top, highlightbackground='#39393a')
+        self.myEntryBox.pack()
+        # submit button
+        self.mySubmitButton = Button(self.top, text='確定', command=self.send, highlightbackground='#39393a')
+        self.mySubmitButton.pack()
+    # when user click submit button
+    def send(self): 
+        self.ans = self.myEntryBox.get()
+        self.top.destroy()
+    # when user click close button
+    def clickCloseButton(self):
+        self.ans = "close"
+        self.top.destroy()
+
 # image processing class
 class ImgProcessing:
     # constructor
@@ -158,15 +192,43 @@ class ImgProcessing:
         # set right image
         self.setRightImage(self.image_Right, "Histogram")
     
-    # gaussian noise
-    def gaussianNoise(self):
+    # set gaussian noise standard deviation
+    def setGaussianNoiseSD(self):
         # set button disabled
+        self.button_choise['state'] = DISABLED
+        self.button_histogram['state'] = DISABLED
+        self.button_gaussianNoise['state'] = DISABLED
+        # create object
+        dialog = Dialog(window, '請輸入標準差')
+        # wait window
+        window.wait_window(dialog.top)
+        # if answer is not none
+        if dialog.ans != "" and dialog.ans.isdigit():
+            self.gaussianNoise(int(dialog.ans))
+        # if user click close button
+        elif dialog.ans == "close":
+            # set button normal
+            self.button_choise['state'] = NORMAL
+            self.button_histogram['state'] = NORMAL
+            self.button_gaussianNoise['state'] = NORMAL
+        else:
+            # set button normal
+            self.button_choise['state'] = NORMAL
+            self.button_histogram['state'] = NORMAL
+            self.button_gaussianNoise['state'] = NORMAL
+            # show messagebox
+            messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
+
+    # gaussian noise
+    def gaussianNoise(self, SD):
+        # set button disabled or normal
+        self.button_choise['state'] = NORMAL
         self.button_histogram['state'] = DISABLED
         self.button_gaussianNoise['state'] = DISABLED
         # range of grayscale
         grayscale = 256
         # initialize a value, if low value generate less noise
-        param = 20
+        param = SD
         # convert image to gray then resize it
         image = self.resize(self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY), 480, 480)
         # initialize a array then filled with zero
@@ -218,7 +280,7 @@ def main():
     # create button (frame, text, background color, call function, state)
     imgProcessing.button_choise = Button(frame_button, text="選擇影像", highlightbackground='#051636', command=imgProcessing.upload)
     imgProcessing.button_histogram = Button(frame_button, text="直方圖", highlightbackground='#051636', command=imgProcessing.histogram, state="disabled")
-    imgProcessing.button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.gaussianNoise, state="disabled")
+    imgProcessing.button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.setGaussianNoiseSD, state="disabled")
     # position
     imgProcessing.button_choise.grid(row=1, column=1, pady=20, padx=5)
     imgProcessing.button_histogram.grid(row=1, column=2, pady=20, padx=5)
