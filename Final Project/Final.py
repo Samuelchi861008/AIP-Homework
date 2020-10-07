@@ -71,7 +71,7 @@ class ImgProcessing:
         self.image_Left = None
         self.image_Right = None
         self.size = None
-        self.resizeImageSize = [480, 480]
+        self.resizeImageSize = [480, 480] # [height, width]
         self.canvas = None
         self.button_choise = None
 
