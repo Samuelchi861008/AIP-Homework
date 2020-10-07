@@ -71,6 +71,7 @@ class ImgProcessing:
         self.image_Left = None
         self.image_Right = None
         self.size = None
+        self.resizeImageSize = [480, 480]
         self.canvas = None
         self.button_choise = None
 
@@ -79,7 +80,7 @@ class ImgProcessing:
         # set image for download
         self.image_Left = image
         # convert color then resize image
-        image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA), 480, 480)
+        image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA), self.resizeImageSize[0], self.resizeImageSize[1])
         # convert image to PIL then convert to ImageTk format
         image = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
         # if panel is none
@@ -98,7 +99,7 @@ class ImgProcessing:
         # set image for download
         self.image_Right = image
         # convert color then resize image
-        image = self.resize(self.canny(self.convertColor(image, cv2.COLOR_BGR2GRAY)), 480, 480)
+        image = self.resize(self.ROI(self.canny(self.convertColor(image, cv2.COLOR_BGR2GRAY))), self.resizeImageSize[0], self.resizeImageSize[1])
         # convert image to PIL then convert to ImageTk format
         image = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
         # if panel is none
@@ -150,6 +151,14 @@ class ImgProcessing:
         image = cv2.Canny(image, low_threshold, high_threshold)
         return image
     
+    # Region of Interests
+    def ROI(self, image):
+        region_of_interest_vertices = [(0, self.size[0]),(self.size[1] / 2, self.size[0] / 2),(self.size[1], self.size[0])]
+        mask = np.zeros_like(image)
+        cv2.fillPoly(mask, np.array([region_of_interest_vertices],np.int32), 255)
+        image = cv2.bitwise_and(image, mask)
+        return image
+    
     # set gaussian noise standard deviation
     def setGaussianNoiseSD(self):
         # set button disabled
@@ -180,12 +189,12 @@ class ImgProcessing:
         # initialize a value, if low value generate less noise
         param = SD
         # convert image to gray then resize it
-        image = self.resize(self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY), 480, 480)
+        image = self.resize(self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY), self.resizeImageSize[0], self.resizeImageSize[1])
         # initialize a array then filled with zero
-        newimg = np.zeros((480, 480), np.uint8)
+        newimg = np.zeros((self.resizeImageSize[0], self.resizeImageSize[1]), np.uint8)
         # use nested loops read image every pixel
-        for i in range(0, 480):
-            for j in range(0, 480, 2):
+        for i in range(0, self.resizeImageSize[0]):
+            for j in range(0, self.resizeImageSize[1], 2):
                 # generate two random number
                 r1 = np.random.random_sample()
                 r2 = np.random.random_sample()
