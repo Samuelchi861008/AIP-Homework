@@ -99,7 +99,7 @@ class ImgProcessing:
         # set image for download
         self.image_Right = image
         # convert color then resize image
-        image = self.resize(self.ROI(self.canny(self.convertColor(image, cv2.COLOR_BGR2GRAY))), self.resizeImageSize[0], self.resizeImageSize[1])
+        image = self.resize(self.convertColor(self.draw_lines(image, self.hough_lines(self.ROI(self.canny(self.convertColor(image, cv2.COLOR_BGR2GRAY))))), cv2.COLOR_BGR2RGBA), self.resizeImageSize[0], self.resizeImageSize[1])
         # convert image to PIL then convert to ImageTk format
         image = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
         # if panel is none
@@ -157,6 +157,24 @@ class ImgProcessing:
         mask = np.zeros_like(image)
         cv2.fillPoly(mask, np.array([region_of_interest_vertices],np.int32), 255)
         image = cv2.bitwise_and(image, mask)
+        return image
+    
+    # hough line
+    def hough_lines(self, image, rho=6, theta=np.pi/180, threshold=160, min_line_len=40, max_line_gap=25):
+        lines=cv2.HoughLinesP(image,rho,theta,threshold,np.array([]),minLineLength=min_line_len, maxLineGap=max_line_gap)
+        return lines
+
+    # draw line
+    def draw_lines(self, image, lines, color=[255,0,0], thickness=3):
+        if lines is None:
+            return
+        image=np.copy(image)
+        img_channels=image.shape[2]
+        line_img=np.zeros((self.size[0],self.size[1],img_channels),dtype=np.uint8)
+        for line in lines:
+            for x1,y1,x2,y2 in line:
+                cv2.line(line_img,(x1,y1),(x2,y2),color,thickness)
+        image=cv2.addWeighted(image, 0.8, line_img, 1.0, 0.0)
         return image
     
     # set gaussian noise standard deviation
