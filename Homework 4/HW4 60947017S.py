@@ -80,6 +80,22 @@ class ImgProcessing:
         self.button_histogram = None
         self.button_gaussianNoise = None
         self.button_waveletTrans = None
+    
+    def image2array(self, image):
+        """PIL Image to NumPy array"""
+        assert image.mode in ('L', 'RGB', 'CMYK')
+        arr = numpy.fromstring(image.tobytes(), numpy.uint8)
+        arr.shape = (image.size[1], image.size[0], len(image.getbands()))
+        return arr.swapaxes(0, 2).swapaxes(1, 2).astype(numpy.float32)
+
+
+    def array2image(self, arr, mode):
+        """NumPy array to PIL Image"""
+        arr = arr.swapaxes(1, 2).swapaxes(0, 2)
+        arr[arr < 0] = 0
+        arr[arr > 255] = 255
+        arr = numpy.fix(arr).astype(numpy.uint8)
+        return Image.frombytes(mode, arr.shape[1::-1], arr.tobytes())
 
     # set Left Image
     def setLeftImage(self, image, event):
@@ -273,6 +289,36 @@ class ImgProcessing:
         self.setLeftImage(newimg, "AlreadyGray")
         # set right image
         self.setRightImage(newimg, "GaussianNoise")
+    
+    # set wavelet transform level
+    def setWaveletLevel(self):
+        # set button disabled
+        self.button_choise['state'] = DISABLED
+        self.button_histogram['state'] = DISABLED
+        self.button_gaussianNoise['state'] = DISABLED
+        self.button_waveletTrans['state'] = DISABLED
+        # create object
+        dialog = Dialog(window, '請輸入小波轉換層數 (介於 1~3 之間)')
+        # wait window
+        window.wait_window(dialog.top)
+        # if answer is not none
+        if dialog.ans != "" and dialog.ans.isdigit():
+            self.gaussianNoise(int(dialog.ans))
+        # if user click close button
+        elif dialog.ans == "close":
+            # set button normal
+            self.button_choise['state'] = NORMAL
+            self.button_histogram['state'] = NORMAL
+            self.button_gaussianNoise['state'] = NORMAL
+            self.button_waveletTrans['state'] = NORMAL
+        else:
+            # set button normal
+            self.button_choise['state'] = NORMAL
+            self.button_histogram['state'] = NORMAL
+            self.button_gaussianNoise['state'] = NORMAL
+            self.button_waveletTrans['state'] = NORMAL
+            # show messagebox
+            messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
 
 # main
 def main():
@@ -288,7 +334,7 @@ def main():
     imgProcessing.button_choise = Button(frame_button, text="選擇影像", highlightbackground='#051636', command=imgProcessing.upload)
     imgProcessing.button_histogram = Button(frame_button, text="直方圖", highlightbackground='#051636', command=imgProcessing.histogram, state="disabled")
     imgProcessing.button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.setGaussianNoiseSD, state="disabled")
-    imgProcessing.button_waveletTrans = Button(frame_button, text="小波轉換", highlightbackground='#051636', command=imgProcessing.setGaussianNoiseSD, state="disabled")
+    imgProcessing.button_waveletTrans = Button(frame_button, text="小波轉換", highlightbackground='#051636', command=imgProcessing.setWaveletLevel, state="disabled")
     # position
     imgProcessing.button_choise.grid(row=1, column=1, pady=20, padx=5)
     imgProcessing.button_histogram.grid(row=1, column=2, pady=20, padx=5)
