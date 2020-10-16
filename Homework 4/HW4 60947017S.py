@@ -79,6 +79,7 @@ class ImgProcessing:
         self.button_choise = None
         self.button_histogram = None
         self.button_gaussianNoise = None
+        self.button_waveletTrans = None
 
     # set Left Image
     def setLeftImage(self, image, event):
@@ -144,8 +145,8 @@ class ImgProcessing:
         elif len(self.imgPath) > 0:
             # set button normal
             self.button_histogram['state'] = NORMAL
-            # set button normal
             self.button_gaussianNoise['state'] = NORMAL
+            self.button_waveletTrans['state'] = NORMAL
             # image read by openCV
             image = cv2.imdecode(np.fromfile(self.imgPath, dtype=np.uint8), 1)
             # get image size
@@ -188,6 +189,7 @@ class ImgProcessing:
         # set button disabled
         self.button_histogram['state'] = DISABLED
         self.button_gaussianNoise['state'] = DISABLED
+        self.button_waveletTrans['state'] = DISABLED
         # set left image
         self.setLeftImage(self.image_Left, "Gray")
         # set right image
@@ -199,6 +201,7 @@ class ImgProcessing:
         self.button_choise['state'] = DISABLED
         self.button_histogram['state'] = DISABLED
         self.button_gaussianNoise['state'] = DISABLED
+        self.button_waveletTrans['state'] = DISABLED
         # create object
         dialog = Dialog(window, '請輸入標準差')
         # wait window
@@ -212,11 +215,13 @@ class ImgProcessing:
             self.button_choise['state'] = NORMAL
             self.button_histogram['state'] = NORMAL
             self.button_gaussianNoise['state'] = NORMAL
+            self.button_waveletTrans['state'] = NORMAL
         else:
             # set button normal
             self.button_choise['state'] = NORMAL
             self.button_histogram['state'] = NORMAL
             self.button_gaussianNoise['state'] = NORMAL
+            self.button_waveletTrans['state'] = NORMAL
             # show messagebox
             messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
 
@@ -226,6 +231,7 @@ class ImgProcessing:
         self.button_choise['state'] = NORMAL
         self.button_histogram['state'] = DISABLED
         self.button_gaussianNoise['state'] = DISABLED
+        self.button_waveletTrans['state'] = DISABLED
         # range of grayscale
         grayscale = 256
         # initialize a value, if low value generate less noise
@@ -282,10 +288,12 @@ def main():
     imgProcessing.button_choise = Button(frame_button, text="選擇影像", highlightbackground='#051636', command=imgProcessing.upload)
     imgProcessing.button_histogram = Button(frame_button, text="直方圖", highlightbackground='#051636', command=imgProcessing.histogram, state="disabled")
     imgProcessing.button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.setGaussianNoiseSD, state="disabled")
+    imgProcessing.button_waveletTrans = Button(frame_button, text="小波轉換", highlightbackground='#051636', command=imgProcessing.setGaussianNoiseSD, state="disabled")
     # position
     imgProcessing.button_choise.grid(row=1, column=1, pady=20, padx=5)
     imgProcessing.button_histogram.grid(row=1, column=2, pady=20, padx=5)
     imgProcessing.button_gaussianNoise.grid(row=1, column=3, pady=20, padx=5)
+    imgProcessing.button_waveletTrans.grid(row=1, column=4, pady=20, padx=5)
     # set Text
     text_before = Label(frame_Text, text = "輸入影像", bg="#051636", fg="green")
     text_before.grid(row=1, column=1, padx=195, pady=10)
