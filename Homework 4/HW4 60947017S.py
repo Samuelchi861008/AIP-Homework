@@ -82,8 +82,8 @@ class ImgProcessing:
         self.button_waveletTrans = None
     
     # image to 1D array
-    def imageToArray(self):
-        return self.image_Left.flatten()
+    def imageToArray(self, image):
+        return image.flatten()
     
     # 1D array to image
     def arrayToImage(self, array):
@@ -117,8 +117,10 @@ class ImgProcessing:
         # set image for download
         self.image_Right = image
         # convert color then resize image
-        if event != "GaussianNoise":
+        if event != "GaussianNoise" and event != "Wavelet":
             image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA if event != "Histogram" else cv2.COLOR_BGR2GRAY), 480, 480)
+        elif event == "Wavelet":
+            image = self.resize(image, 480, 480)
         # if user want see histogram
         if event == "Histogram" or event == "GaussianNoise":
             # set Right panel is Figure
@@ -139,7 +141,8 @@ class ImgProcessing:
             self.panel_Right.image = image
             self.panel_Right.pack(side="right", padx=10, pady=10)
             # set panel click event
-            self.panel_Right.bind("<Button-1>", self.download)
+            if event == "Original":
+                self.panel_Right.bind("<Button-1>", self.download)
 
     # upload image
     def upload(self):
@@ -298,7 +301,7 @@ class ImgProcessing:
             # set left image
             self.setLeftImage(self.image_Left, "Gray")
             # set right image
-            self.setRightImage(self.haarFWT(self.image_Left, 3), "Original")
+            self.setRightImage(self.haarFWT(3), "Wavelet")
             # set button normal
             self.button_choise['state'] = NORMAL
         # if user click close button
@@ -340,7 +343,9 @@ class ImgProcessing:
     #     resultimg = result.astype(np.uint8)
     #     return resultimg
 
-    def haarFWT(self, signal, level):
+    def haarFWT(self, level):
+        image = self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY)
+        signal = self.imageToArray(image)
         s = .5
         h = [ 1,  1 ]
         g = [ 1, -1 ]
@@ -348,18 +353,18 @@ class ImgProcessing:
         t = signal
         l = len ( t )
         y = [0] * l
-        # t = np.pad(array=t, pad_width=((1,1),(1,1),(1,1)), mode='constant', constant_values=0)
-        # t = t + [ 0, 0 ]
+        t = np.pad(array=t, pad_width=(1,1), mode='constant', constant_values=0)
         for i in range ( level ):
             y [ 0:l ] = [0] * l
             l2 = l // 2
             for j in range ( l2 ):
                 for k in range ( f ):
-                    y [j]    += t [ 2*j + k ] * h [ k ] * s
-                    y [j+l2] += t [ 2*j + k ] * g [ k ] * s
+                    y [j]    += int(t [ 2*j + k ] * h [ k ] * s)
+                    y [j+l2] += int(t [ 2*j + k ] * g [ k ] * s)
             l = l2
-            t [ 0:l ] = y [ 0:l ]
-        return y
+            t [ 0:l ] = y [ 0:l ] 
+        resultimg = self.arrayToImage(y).astype(image.dtype)
+        return resultimg
 
 # main
 def main():
