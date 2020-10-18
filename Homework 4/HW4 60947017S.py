@@ -81,21 +81,13 @@ class ImgProcessing:
         self.button_gaussianNoise = None
         self.button_waveletTrans = None
     
-    def image2array(self, image):
-        """PIL Image to NumPy array"""
-        assert image.mode in ('L', 'RGB', 'CMYK')
-        arr = numpy.fromstring(image.tobytes(), numpy.uint8)
-        arr.shape = (image.size[1], image.size[0], len(image.getbands()))
-        return arr.swapaxes(0, 2).swapaxes(1, 2).astype(numpy.float32)
-
-
-    def array2image(self, arr, mode):
-        """NumPy array to PIL Image"""
-        arr = arr.swapaxes(1, 2).swapaxes(0, 2)
-        arr[arr < 0] = 0
-        arr[arr > 255] = 255
-        arr = numpy.fix(arr).astype(numpy.uint8)
-        return Image.frombytes(mode, arr.shape[1::-1], arr.tobytes())
+    # image to 1D array
+    def imageToArray(self):
+        return self.image_Left.flatten()
+    
+    # 1D array to image
+    def arrayToImage(self, array):
+        return np.reshape(np.array(array), (self.size[0], self.size[1], -1))
 
     # set Left Image
     def setLeftImage(self, image, event):
@@ -303,7 +295,12 @@ class ImgProcessing:
         window.wait_window(dialog.top)
         # if answer is not none
         if dialog.ans != "" and dialog.ans.isdigit():
-            self.gaussianNoise(int(dialog.ans))
+            # set left image
+            self.setLeftImage(self.image_Left, "Gray")
+            # set right image
+            self.setRightImage(self.haarFWT(self.image_Left, 3), "Original")
+            # set button normal
+            self.button_choise['state'] = NORMAL
         # if user click close button
         elif dialog.ans == "close":
             # set button normal
@@ -319,6 +316,50 @@ class ImgProcessing:
             self.button_waveletTrans['state'] = NORMAL
             # show messagebox
             messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
+    
+    # def haarFWT(self):
+    #     img = self.image_Left
+    #     image = img.astype(np.float)
+    #     height, width = image.shape[:2]
+    #     result = np.zeros((height, width, 3), np.float)
+    #     width2 = width // 2
+    #     for i in range(height):
+    #         for j in range(0, width - 1, 2):
+    #             j1 = j + 1
+    #             j2 = j // 2
+    #             result[i, j2] = (image[i, j] + image[i, j1]) // 2
+    #             result[i, width2 + j2] = (image[i, j] - image[i, j1]) // 2
+    #     image = np.copy(result)
+    #     height2 = height // 2
+    #     for i in range(0, height - 1, 2):
+    #         for j in range(0, width):
+    #             i1 = i + 1
+    #             i2 = i // 2
+    #             result[i2, j] = (image[i, j] + image[i1, j]) // 2
+    #             result[height2 + i2, j] = (image[i, j] - image[i1, j]) // 2
+    #     resultimg = result.astype(np.uint8)
+    #     return resultimg
+
+    def haarFWT(self, signal, level):
+        s = .5
+        h = [ 1,  1 ]
+        g = [ 1, -1 ]
+        f = len ( h )
+        t = signal
+        l = len ( t )
+        y = [0] * l
+        # t = np.pad(array=t, pad_width=((1,1),(1,1),(1,1)), mode='constant', constant_values=0)
+        # t = t + [ 0, 0 ]
+        for i in range ( level ):
+            y [ 0:l ] = [0] * l
+            l2 = l // 2
+            for j in range ( l2 ):
+                for k in range ( f ):
+                    y [j]    += t [ 2*j + k ] * h [ k ] * s
+                    y [j+l2] += t [ 2*j + k ] * g [ k ] * s
+            l = l2
+            t [ 0:l ] = y [ 0:l ]
+        return y
 
 # main
 def main():
