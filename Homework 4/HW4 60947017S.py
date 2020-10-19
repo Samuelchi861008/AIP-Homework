@@ -5,6 +5,7 @@
 # pip install opencv-python
 # pip install matplotlib==3.1.3
 
+import pywt
 import numpy as np
 from tkinter import *
 from tkinter import filedialog, messagebox
@@ -343,28 +344,45 @@ class ImgProcessing:
     #     resultimg = result.astype(np.uint8)
     #     return resultimg
 
-    def haarFWT(self, level):
-        image = self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY)
-        signal = self.imageToArray(image)
-        s = .5
-        h = [ 1,  1 ]
-        g = [ 1, -1 ]
-        f = len ( h )
-        t = signal
-        l = len ( t )
-        y = [0] * l
-        t = np.pad(array=t, pad_width=(1,1), mode='constant', constant_values=0)
-        for i in range ( level ):
-            y [ 0:l ] = [0] * l
-            l2 = l // 2
-            for j in range ( l2 ):
-                for k in range ( f ):
-                    y [j]    += int(t [ 2*j + k ] * h [ k ] * s)
-                    y [j+l2] += int(t [ 2*j + k ] * g [ k ] * s)
-            l = l2
-            t [ 0:l ] = y [ 0:l ] 
-        resultimg = self.arrayToImage(y).astype(image.dtype)
-        return resultimg
+    # def haarFWT(self, level):
+    #     image = self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY)
+    #     signal = self.imageToArray(image)
+    #     s = .5
+    #     h = [1, 1]
+    #     g = [1, -1]
+    #     f = len (h)
+    #     t = signal
+    #     l = len (t)
+    #     y = [0] * l
+    #     t = np.pad(array=t, pad_width=(1,1), mode='constant', constant_values=0)
+    #     for i in range (level):
+    #         y [0:l] = [0] * l
+    #         l2 = l // 2
+    #         for j in range (0, l2):
+    #             for k in range (0, f):
+    #                 y [j]    += int(t[2*j + k] * h[k] * s)
+    #                 y [j+l2] += int(t[2*j + k] * g[k] * s)
+    #         l = l2
+    #         t[0:l] = y[0:l]
+    #     resultimg = self.arrayToImage(y).astype(image.dtype)
+    #     return resultimg
+
+    # def haarFWT(self, level):
+    #     image = self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY)
+    #     image =  np.float32(image)
+    #     image /= 255
+    #     height, width = image.shape[:2]
+
+    #     coeffs=pywt.wavedec2(image, 'haar', level=level)
+
+    #     coeffs_H=list(coeffs)
+    #     coeffs_H[0] *= 0
+
+    #     imArray_H = pywt.waverec2(coeffs_H, 'haar')
+    #     imArray_H *= 255
+    #     imArray_H =  np.uint8(imArray_H)
+        
+    #     return imArray_H
 
 # main
 def main():
