@@ -81,14 +81,6 @@ class ImgProcessing:
         self.button_histogram = None
         self.button_gaussianNoise = None
         self.button_waveletTrans = None
-    
-    # image to 1D array
-    def imageToArray(self, image):
-        return image.flatten()
-    
-    # 1D array to image
-    def arrayToImage(self, array):
-        return np.reshape(np.array(array), (self.size[0], self.size[1], -1))
 
     # set Left Image
     def setLeftImage(self, image, event):
@@ -302,7 +294,12 @@ class ImgProcessing:
             # set left image
             self.setLeftImage(self.image_Left, "Gray")
             # set right image
-            self.setRightImage(self.haarFWT(3), "Wavelet")
+            for i in range(0, int(dialog.ans)):
+                if i == 0:
+                    haarFWT(self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY))
+                else:
+                    haarFWT(np.zeros((self.size[0], self.size[1])))
+            # self.setRightImage(self.haarFWT(3), "Wavelet")
             # set button normal
             self.button_choise['state'] = NORMAL
         # if user click close button
@@ -321,68 +318,48 @@ class ImgProcessing:
             # show messagebox
             messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
     
-    # def haarFWT(self):
-    #     img = self.image_Left
-    #     image = img.astype(np.float)
-    #     height, width = image.shape[:2]
-    #     result = np.zeros((height, width, 3), np.float)
-    #     width2 = width // 2
-    #     for i in range(height):
-    #         for j in range(0, width - 1, 2):
-    #             j1 = j + 1
-    #             j2 = j // 2
-    #             result[i, j2] = (image[i, j] + image[i, j1]) // 2
-    #             result[i, width2 + j2] = (image[i, j] - image[i, j1]) // 2
-    #     image = np.copy(result)
-    #     height2 = height // 2
-    #     for i in range(0, height - 1, 2):
-    #         for j in range(0, width):
-    #             i1 = i + 1
-    #             i2 = i // 2
-    #             result[i2, j] = (image[i, j] + image[i1, j]) // 2
-    #             result[height2 + i2, j] = (image[i, j] - image[i1, j]) // 2
-    #     resultimg = result.astype(np.uint8)
-    #     return resultimg
+    def haarFWT(self, image):
+        height = int(self.size[0] / 2)
+        width = int(self.size[1] / 2)
 
-    # def haarFWT(self, level):
-    #     image = self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY)
-    #     signal = self.imageToArray(image)
-    #     s = .5
-    #     h = [1, 1]
-    #     g = [1, -1]
-    #     f = len (h)
-    #     t = signal
-    #     l = len (t)
-    #     y = [0] * l
-    #     t = np.pad(array=t, pad_width=(1,1), mode='constant', constant_values=0)
-    #     for i in range (level):
-    #         y [0:l] = [0] * l
-    #         l2 = l // 2
-    #         for j in range (0, l2):
-    #             for k in range (0, f):
-    #                 y [j]    += int(t[2*j + k] * h[k] * s)
-    #                 y [j+l2] += int(t[2*j + k] * g[k] * s)
-    #         l = l2
-    #         t[0:l] = y[0:l]
-    #     resultimg = self.arrayToImage(y).astype(image.dtype)
-    #     return resultimg
+        LL = np.zeros((height, width))
+        LH = np.zeros((height, width))
+        HH = np.zeros((height, width))
+        HL = np.zeros((height, width))
+        Lowpass = np.zeros((self.size[0], width))
+        Highpass = np.zeros((self.size[0], width))
 
-    # def haarFWT(self, level):
-    #     image = self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY)
-    #     image =  np.float32(image)
-    #     image /= 255
-    #     height, width = image.shape[:2]
-
-    #     coeffs=pywt.wavedec2(image, 'haar', level=level)
-
-    #     coeffs_H=list(coeffs)
-    #     coeffs_H[0] *= 0
-
-    #     imArray_H = pywt.waverec2(coeffs_H, 'haar')
-    #     imArray_H *= 255
-    #     imArray_H =  np.uint8(imArray_H)
+        for i in range (0, self.size[0]):
+            for j in range(0, self.size[1], 2):
+                w = int(j/2)
+                Lowpass[i, w] = int((img[i, j]/2) + (img[i, j+1]/2))
+                Highpass[i, w] = img[i, j] - Lowpass[i, w]
         
-    #     return imArray_H
+        p, q = Lowpass.shape
+        for i in range (0, p, 2):
+            for j in range(0,q):
+                h = int(i/2)
+                LL[h, j] = int((Lowpass[i, j]/2) + (Lowpass[i+1, j]/2))
+                LH[h, j] = int((Lowpass[i, j]) - LL[h, j])
+                HH[h, j] = int((Highpass[i, j]/2) + Highpass[i, j]/2)
+                HL[h, j] = int(Highpass[i, j] - HL[h, j])
+        
+        LH[LH < 0] = 0
+        LH = cv2.normalize(LH,None,0,255,cv2.NORM_MINMAX)
+        HL[HL < 0] = 0
+        HL = cv2.normalize(HL,None,0,255,cv2.NORM_MINMAX)
+        HH[HH < 0] = 0
+        HH = cv2.normalize(HH,None,0,255,cv2.NORM_MINMAX)
+
+        image[0:height, 0:width] = LL[:,:]
+        image[height:self.size[0], 0:width] = HL[:,:]
+        image[0:height, width:self.size[1]] = LH[:,:]
+        image[height:self.size[0], width:self.size[1]] = HH[:,:]
+
+        self.size[0] = int(self.size[0] / 2)
+        self.size[1] = int(self.size[1] / 2)
+
+        return image
 
 # main
 def main():
