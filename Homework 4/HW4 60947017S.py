@@ -5,7 +5,6 @@
 # pip install opencv-python
 # pip install matplotlib==3.1.3
 
-import pywt
 import numpy as np
 from tkinter import *
 from tkinter import filedialog, messagebox
@@ -73,6 +72,7 @@ class ImgProcessing:
         self.panel_Left = None
         self.panel_Right = None
         self.imgPath = None
+        self.image_original = None
         self.image_Left = None
         self.image_Right = None
         self.size = None
@@ -112,8 +112,8 @@ class ImgProcessing:
         # convert color then resize image
         if event != "GaussianNoise" and event != "Wavelet":
             image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA if event != "Histogram" else cv2.COLOR_BGR2GRAY), 480, 480)
-        elif event == "Wavelet":
-            image = self.resize(image, 480, 480)
+        # elif event == "Wavelet":
+        #     image = self.resize(image, 480, 480)
         # if user want see histogram
         if event == "Histogram" or event == "GaussianNoise":
             # set Right panel is Figure
@@ -152,12 +152,12 @@ class ImgProcessing:
             self.button_gaussianNoise['state'] = NORMAL
             self.button_waveletTrans['state'] = NORMAL
             # image read by openCV
-            image = cv2.imdecode(np.fromfile(self.imgPath, dtype=np.uint8), 1)
+            self.image_original = cv2.imdecode(np.fromfile(self.imgPath, dtype=np.uint8), 1)
             # get image size
-            self.size = image.shape
+            self.size = self.image_original.shape
             # set two panel image
-            self.setLeftImage(image, "Original")
-            self.setRightImage(image, "Original")
+            self.setLeftImage(self.image_original, "Original")
+            self.setRightImage(self.image_original, "Original")
             # show messagebox
             messagebox.showinfo("提醒", "已上傳 " + extensionFileName + " 檔案\n大小為 " + str(self.size[0:2]))
 
@@ -286,20 +286,24 @@ class ImgProcessing:
         self.button_gaussianNoise['state'] = DISABLED
         self.button_waveletTrans['state'] = DISABLED
         # create object
-        dialog = Dialog(window, '請輸入小波轉換層數 (介於 1~3 之間)')
+        dialog = Dialog(window, '請輸入小波轉換層數')
         # wait window
         window.wait_window(dialog.top)
         # if answer is not none
         if dialog.ans != "" and dialog.ans.isdigit():
             # set left image
             self.setLeftImage(self.image_Left, "Gray")
-            # set right image
+            # call harr function and set right image
+            image = self.resize(self.convertColor(self.image_original, cv2.COLOR_BGR2GRAY), 480, 480)
+            self.size = list(image.shape)
+            self.image_Right = np.zeros((self.size[0], self.size[1]))
             for i in range(0, int(dialog.ans)):
                 if i == 0:
-                    haarFWT(self.convertColor(self.image_Left, cv2.COLOR_BGR2GRAY))
+                    self.haarDWT(image)
                 else:
-                    haarFWT(np.zeros((self.size[0], self.size[1])))
-            # self.setRightImage(self.haarFWT(3), "Wavelet")
+                    self.haarDWT(self.image_Right)
+            # set Right image
+            self.setRightImage(self.image_Right, "Wavelet")
             # set button normal
             self.button_choise['state'] = NORMAL
         # if user click close button
@@ -318,7 +322,8 @@ class ImgProcessing:
             # show messagebox
             messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
     
-    def haarFWT(self, image):
+    # Harr Discrete Wavelet Transform
+    def haarDWT(self, image):
         height = int(self.size[0] / 2)
         width = int(self.size[1] / 2)
 
@@ -332,8 +337,8 @@ class ImgProcessing:
         for i in range (0, self.size[0]):
             for j in range(0, self.size[1], 2):
                 w = int(j/2)
-                Lowpass[i, w] = int((img[i, j]/2) + (img[i, j+1]/2))
-                Highpass[i, w] = img[i, j] - Lowpass[i, w]
+                Lowpass[i, w] = int((image[i, j] / 2) + (image[i, j+1] / 2))
+                Highpass[i, w] = image[i, j] - Lowpass[i, w]
         
         p, q = Lowpass.shape
         for i in range (0, p, 2):
@@ -351,15 +356,13 @@ class ImgProcessing:
         HH[HH < 0] = 0
         HH = cv2.normalize(HH,None,0,255,cv2.NORM_MINMAX)
 
-        image[0:height, 0:width] = LL[:,:]
-        image[height:self.size[0], 0:width] = HL[:,:]
-        image[0:height, width:self.size[1]] = LH[:,:]
-        image[height:self.size[0], width:self.size[1]] = HH[:,:]
+        self.image_Right[0:height, 0:width] = LL[:,:]
+        self.image_Right[height:self.size[0], 0:width] = HL[:,:]
+        self.image_Right[0:height, width:self.size[1]] = LH[:,:]
+        self.image_Right[height:self.size[0], width:self.size[1]] = HH[:,:]
 
         self.size[0] = int(self.size[0] / 2)
         self.size[1] = int(self.size[1] / 2)
-
-        return image
 
 # main
 def main():
