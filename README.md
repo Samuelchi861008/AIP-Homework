@@ -9,6 +9,8 @@
 |
 ├── Homework 2: Image histogram
 |
-└── Homework 3: Generation of additive, zero mean Gaussian noise
+├── Homework 3: Generation of additive, zero mean Gaussian noise
+|
+└── Homework 4: Discrete wavelet transform
 
 ```
