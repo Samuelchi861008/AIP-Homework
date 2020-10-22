@@ -291,8 +291,6 @@ class ImgProcessing:
         window.wait_window(dialog.top)
         # if answer is not none
         if dialog.ans != "" and dialog.ans.isdigit():
-            # set left image
-            self.setLeftImage(self.image_Left, "Gray")
             # call harr function and set right image
             image = self.resize(self.convertColor(self.image_original, cv2.COLOR_BGR2GRAY), 480, 480)
             self.size = list(image.shape)
@@ -302,6 +300,8 @@ class ImgProcessing:
                     self.haarDWT(image)
                 else:
                     self.haarDWT(self.image_Right)
+            # set left image
+            self.setLeftImage(self.image_Left, "Gray")
             # set Right image
             self.setRightImage(self.image_Right, "Wavelet")
             # set button normal
@@ -336,25 +336,22 @@ class ImgProcessing:
 
         for i in range (0, self.size[0]):
             for j in range(0, self.size[1], 2):
-                w = int(j/2)
-                Lowpass[i, w] = int((image[i, j] / 2) + (image[i, j+1] / 2))
-                Highpass[i, w] = image[i, j] - Lowpass[i, w]
+                Lowpass[i, int(j/2)] = int((image[i, j] / 2) + (image[i, j+1] / 2))
+                Highpass[i, int(j/2)] = image[i, j] - Lowpass[i, int(j/2)]
         
-        p, q = Lowpass.shape
-        for i in range (0, p, 2):
-            for j in range(0,q):
-                h = int(i/2)
-                LL[h, j] = int((Lowpass[i, j]/2) + (Lowpass[i+1, j]/2))
-                LH[h, j] = int((Lowpass[i, j]) - LL[h, j])
-                HH[h, j] = int((Highpass[i, j]/2) + Highpass[i, j]/2)
-                HL[h, j] = int(Highpass[i, j] - HL[h, j])
+        for i in range (0, Lowpass.shape[0], 2):
+            for j in range(0, Lowpass.shape[1]):
+                LL[int(i/2), j] = int((Lowpass[i, j]/2) + (Lowpass[i+1, j]/2))
+                LH[int(i/2), j] = int((Lowpass[i, j]) - LL[int(i/2), j])
+                HH[int(i/2), j] = int((Highpass[i, j]/2) + Highpass[i, j]/2)
+                HL[int(i/2), j] = int(Highpass[i, j] - HL[int(i/2), j])
         
         LH[LH < 0] = 0
-        LH = cv2.normalize(LH,None,0,255,cv2.NORM_MINMAX)
+        LH = cv2.normalize(LH, None, 0, 255, cv2.NORM_MINMAX)
         HL[HL < 0] = 0
-        HL = cv2.normalize(HL,None,0,255,cv2.NORM_MINMAX)
+        HL = cv2.normalize(HL, None, 0, 255, cv2.NORM_MINMAX)
         HH[HH < 0] = 0
-        HH = cv2.normalize(HH,None,0,255,cv2.NORM_MINMAX)
+        HH = cv2.normalize(HH, None, 0, 255, cv2.NORM_MINMAX)
 
         self.image_Right[0:height, 0:width] = LL[:,:]
         self.image_Right[height:self.size[0], 0:width] = HL[:,:]
