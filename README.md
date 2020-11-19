@@ -11,6 +11,10 @@
 |
 ├── Homework 3: Generation of additive, zero mean Gaussian noise
 |
-└── Homework 4: Discrete wavelet transform
+├── Homework 4: Discrete wavelet transform
+|
+├── Homework 5: Histogram equalization
+|
+└── Homework 6: Image smoothing and edge detection
 
 ```
