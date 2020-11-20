@@ -78,6 +78,8 @@ class ImgProcessing:
         self.image_original = None
         self.image_Left = None
         self.image_Right = None
+        self.frame_Left = None
+        self.frame_Right = None
         self.size = None
         self.canvasLeft = None
         self.canvasRight = None
@@ -96,23 +98,27 @@ class ImgProcessing:
             self.canvasLeft.get_tk_widget().destroy() if isinstance(self.panel_Left, Figure) else self.panel_Left.destroy()
             if isinstance(self.panel_LeftHisEqu, Figure):
                 self.canvasLeft.get_tk_widget().destroy()
+                self.frame_Left.destroy()
         # convert color then resize image
         if event != "AlreadyGray" and event != "HistogramEqualization":
             image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA if event != "Gray" else cv2.COLOR_BGR2GRAY), 480, 480)
         if event == "HistogramEqualization":
+            # create frame
+            self.frame_Left = Frame(window, background='#051636')
+            self.frame_Left.pack(side=LEFT)
             # convert image to PIL then convert to ImageTk format
             PILImage = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(self.resize(image, 480, 240)))
             # set image in Right panel top
-            self.panel_Left = Label(image=PILImage,width=480,height=240)
+            self.panel_Left = Label(self.frame_Left, image=PILImage,width=480,height=240)
             self.panel_Left.image = PILImage
-            self.panel_Left.pack(side="left", padx=10, pady=10)
+            self.panel_Left.grid(row=1, column=1, padx=10, pady=10)
             # set Histogram in Right panel bottom
             self.panel_LeftHisEqu = Figure(figsize=(4.8, 2.4), dpi=100)
             plot = self.panel_LeftHisEqu.add_subplot(111)
             plot.title.set_text('Image Histogram')
-            plot.bar(range(1,257), [x[0] for x in iter(list(cv2.calcHist([self.resize(image, 480, 240)], [0], None, [256], [0, 256])))])
-            self.canvasLeft = FigureCanvasTkAgg(self.panel_LeftHisEqu, window)
-            self.canvasLeft.get_tk_widget().pack(side="bottom", padx=10, pady=10)
+            plot.bar(range(1,257), [x[0] for x in iter(list(cv2.calcHist([image], [0], None, [256], [0, 256])))])
+            self.canvasLeft = FigureCanvasTkAgg(self.panel_LeftHisEqu, self.frame_Left)
+            self.canvasLeft.get_tk_widget().grid(row=2, column=1, padx=15, pady=5)
         else:
             # convert image to PIL then convert to ImageTk format
             PILImage = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
@@ -125,9 +131,10 @@ class ImgProcessing:
     def setRightImage(self, image, event):
         # if not None clear Right panel
         if self.panel_Right != None or self.panel_RightHisEqu != None:
-            self.canvas.get_tk_widget().destroy() if isinstance(self.panel_Right, Figure) else self.panel_Right.destroy()
+            self.canvasRight.get_tk_widget().destroy() if isinstance(self.panel_Right, Figure) else self.panel_Right.destroy()
             if isinstance(self.panel_RightHisEqu, Figure):
-                self.canvas.get_tk_widget().destroy()
+                self.canvasRight.get_tk_widget().destroy()
+                self.frame_Right.destroy()
         # set image for download
         self.image_Right = image
         # convert color then resize image
@@ -146,19 +153,22 @@ class ImgProcessing:
             # set canvas position
             self.canvasRight.get_tk_widget().pack(side="right", padx=10, pady=10)
         elif event == "HistogramEqualization":
+            # create frame
+            self.frame_Right = Frame(window, background='#051636')
+            self.frame_Right.pack(side=RIGHT)
             # convert image to PIL then convert to ImageTk format
             PILImage = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(self.resize(image, 480, 240)))
             # set image in Right panel top
-            self.panel_Right = Label(image=PILImage,width=480,height=240)
+            self.panel_Right = Label(self.frame_Right, image=PILImage,width=480,height=240)
             self.panel_Right.image = PILImage
-            self.panel_Right.pack(side="top", padx=10, pady=10)
+            self.panel_Right.grid(row=1, column=1, padx=10, pady=10)
             # set Histogram in Right panel bottom
             self.panel_RightHisEqu = Figure(figsize=(4.8, 2.4), dpi=100)
             plot = self.panel_RightHisEqu.add_subplot(111)
             plot.title.set_text('Image Histogram')
-            plot.bar(range(1,257), [x[0] for x in iter(list(cv2.calcHist([self.resize(image, 480, 240)], [0], None, [256], [0, 256])))])
-            self.canvasRight = FigureCanvasTkAgg(self.panel_RightHisEqu, window)
-            self.canvasRight.get_tk_widget().pack(side="bottom", padx=10, pady=10)
+            plot.bar(range(1,257), [x[0] for x in iter(list(cv2.calcHist([image], [0], None, [256], [0, 256])))])
+            self.canvasRight = FigureCanvasTkAgg(self.panel_RightHisEqu, self.frame_Right)
+            self.canvasRight.get_tk_widget().grid(row=2, column=1, padx=15, pady=5)
         else:
             # convert image to PIL then convert to ImageTk format
             image = PIL.ImageTk.PhotoImage(PIL.Image.fromarray(image))
