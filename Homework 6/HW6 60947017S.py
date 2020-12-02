@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# use python3
+# use python 3.7.9
 # pip install numpy
 # pip install Pillow
 # pip install opencv-python
@@ -40,7 +40,7 @@ class Dialog:
         # set dialog width
         self.dialogWidth = 500
         # set dialog height
-        self.dialogHeight = 100
+        self.dialogHeight = 110
         # set dialog
         self.top = Toplevel(parent)
         self.top.protocol("WM_DELETE_WINDOW", self.clickCloseButton)
@@ -465,7 +465,7 @@ class ImgProcessing:
         self.button_convolution['state'] = DISABLED
         self.button_canny['state'] = DISABLED
         # create object
-        dialog = Dialog(window, '請輸入 mask 大小')
+        dialog = Dialog(window, '請輸入 mask 大小\n(例如：輸入 5，即為 5 x 5 pixels)')
         # wait window
         window.wait_window(dialog.top)
         # if answer is not none
@@ -495,7 +495,7 @@ class ImgProcessing:
             self.button_waveletTrans['state'] = NORMAL
             self.button_histogramEq['state'] = NORMAL
             self.button_convolution['state'] = NORMAL
-            self.button_canny['state'] = NORMAL
+            self.button_canny['state'] = DISABLED
         else:
             # set button normal
             self.button_choise['state'] = NORMAL
@@ -504,7 +504,7 @@ class ImgProcessing:
             self.button_waveletTrans['state'] = NORMAL
             self.button_histogramEq['state'] = NORMAL
             self.button_convolution['state'] = NORMAL
-            self.button_canny['state'] = NORMAL
+            self.button_canny['state'] = DISABLED
             # show messagebox
             messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
 
