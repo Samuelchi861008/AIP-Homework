@@ -88,6 +88,10 @@ class ImgProcessing:
         self.button_gaussianNoise = None
         self.button_waveletTrans = None
         self.button_histogramEq = None
+        self.button_convolution = None
+        self.button_canny = None
+        self.openwindow = None
+        self.entry = None
 
     # set Left Image
     def setLeftImage(self, image, event):
@@ -138,7 +142,7 @@ class ImgProcessing:
         # set image for download
         self.image_Right = image
         # convert color then resize image
-        if event != "GaussianNoise" and event != "Wavelet" and event != "HistogramEqualization":
+        if event != "GaussianNoise" and event != "Wavelet" and event != "HistogramEqualization" and event != "convolution":
             image = self.resize(self.convertColor(image, cv2.COLOR_BGR2RGBA if event != "Histogram" else cv2.COLOR_BGR2GRAY), 480, 480)
         # if user want see histogram
         if event == "Histogram" or event == "GaussianNoise":
@@ -195,6 +199,8 @@ class ImgProcessing:
             self.button_gaussianNoise['state'] = NORMAL
             self.button_waveletTrans['state'] = NORMAL
             self.button_histogramEq['state'] = NORMAL
+            self.button_convolution['state'] = NORMAL
+            self.button_canny['state'] = DISABLED
             # image read by openCV
             self.image_original = cv2.imdecode(np.fromfile(self.imgPath, dtype=np.uint8), 1)
             # get image size
@@ -239,6 +245,8 @@ class ImgProcessing:
         self.button_gaussianNoise['state'] = DISABLED
         self.button_waveletTrans['state'] = DISABLED
         self.button_histogramEq['state'] = DISABLED
+        self.button_convolution['state'] = DISABLED
+        self.button_canny['state'] = DISABLED
         # set left image
         self.setLeftImage(self.image_Left, "Gray")
         # set right image
@@ -252,6 +260,8 @@ class ImgProcessing:
         self.button_gaussianNoise['state'] = DISABLED
         self.button_waveletTrans['state'] = DISABLED
         self.button_histogramEq['state'] = DISABLED
+        self.button_convolution['state'] = DISABLED
+        self.button_canny['state'] = DISABLED
         # create object
         dialog = Dialog(window, '請輸入標準差')
         # wait window
@@ -267,6 +277,8 @@ class ImgProcessing:
             self.button_gaussianNoise['state'] = NORMAL
             self.button_waveletTrans['state'] = NORMAL
             self.button_histogramEq['state'] = NORMAL
+            self.button_convolution['state'] = NORMAL
+            self.button_canny['state'] = NORMAL
         else:
             # set button normal
             self.button_choise['state'] = NORMAL
@@ -274,6 +286,8 @@ class ImgProcessing:
             self.button_gaussianNoise['state'] = NORMAL
             self.button_waveletTrans['state'] = NORMAL
             self.button_histogramEq['state'] = NORMAL
+            self.button_convolution['state'] = NORMAL
+            self.button_canny['state'] = NORMAL
             # show messagebox
             messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
 
@@ -285,6 +299,8 @@ class ImgProcessing:
         self.button_gaussianNoise['state'] = DISABLED
         self.button_waveletTrans['state'] = DISABLED
         self.button_histogramEq['state'] = DISABLED
+        self.button_convolution['state'] = DISABLED
+        self.button_canny['state'] = DISABLED
         # range of grayscale
         grayscale = 256
         # initialize a value, if low value generate less noise
@@ -335,6 +351,8 @@ class ImgProcessing:
         self.button_gaussianNoise['state'] = DISABLED
         self.button_waveletTrans['state'] = DISABLED
         self.button_histogramEq['state'] = DISABLED
+        self.button_convolution['state'] = DISABLED
+        self.button_canny['state'] = DISABLED
         # create object
         dialog = Dialog(window, '請輸入小波轉換層數')
         # wait window
@@ -364,6 +382,8 @@ class ImgProcessing:
             self.button_gaussianNoise['state'] = NORMAL
             self.button_waveletTrans['state'] = NORMAL
             self.button_histogramEq['state'] = NORMAL
+            self.button_convolution['state'] = NORMAL
+            self.button_canny['state'] = NORMAL
         else:
             # set button normal
             self.button_choise['state'] = NORMAL
@@ -371,6 +391,8 @@ class ImgProcessing:
             self.button_gaussianNoise['state'] = NORMAL
             self.button_waveletTrans['state'] = NORMAL
             self.button_histogramEq['state'] = NORMAL
+            self.button_convolution['state'] = NORMAL
+            self.button_canny['state'] = NORMAL
             # show messagebox
             messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
     
@@ -431,6 +453,154 @@ class ImgProcessing:
         self.setLeftImage(self.image_original, "HistogramEqualization")
         # set right image
         self.setRightImage(img2, "HistogramEqualization")
+    
+    # Convolution
+    def convolution(self):
+        # set button disabled
+        self.button_choise['state'] = DISABLED
+        self.button_histogram['state'] = DISABLED
+        self.button_gaussianNoise['state'] = DISABLED
+        self.button_waveletTrans['state'] = DISABLED
+        self.button_histogramEq['state'] = DISABLED
+        self.button_convolution['state'] = DISABLED
+        self.button_canny['state'] = DISABLED
+        # create object
+        dialog = Dialog(window, '請輸入 mask 大小')
+        # wait window
+        window.wait_window(dialog.top)
+        # if answer is not none
+        if dialog.ans != "" and dialog.ans.isdigit():
+            image = self.resize(self.convertColor(self.image_original, cv2.COLOR_BGR2GRAY), 480, 480)
+            num = int(dialog.ans)
+            kernel = num*num
+            space = int((num-1)/2)
+            temp = np.pad(image, int(num/2), mode='constant')
+            height, width = temp.shape
+            for i in range(0, height-num+1):
+                for j in range(0, width-num+1):
+                    image[i][j] = int((np.sum(temp[i : i+num , j : j+num]))/kernel)
+            # set left image
+            self.setLeftImage(self.image_Left, "Gray")
+            # set Right image
+            self.setRightImage(image, "convolution")
+            # set button normal
+            self.button_choise['state'] = NORMAL
+            self.button_canny['state'] = NORMAL
+        # if user click close button
+        elif dialog.ans == "close":
+            # set button normal
+            self.button_choise['state'] = NORMAL
+            self.button_histogram['state'] = NORMAL
+            self.button_gaussianNoise['state'] = NORMAL
+            self.button_waveletTrans['state'] = NORMAL
+            self.button_histogramEq['state'] = NORMAL
+            self.button_convolution['state'] = NORMAL
+            self.button_canny['state'] = NORMAL
+        else:
+            # set button normal
+            self.button_choise['state'] = NORMAL
+            self.button_histogram['state'] = NORMAL
+            self.button_gaussianNoise['state'] = NORMAL
+            self.button_waveletTrans['state'] = NORMAL
+            self.button_histogramEq['state'] = NORMAL
+            self.button_convolution['state'] = NORMAL
+            self.button_canny['state'] = NORMAL
+            # show messagebox
+            messagebox.showinfo("警告", "請勿輸入空值或輸入非數字")
+
+    # Canny
+    def canny(self):
+        # set button disabled
+        self.button_choise['state'] = DISABLED
+        self.button_canny['state'] = DISABLED
+        sobelr = np.array([[-1, 0, 1]], np.float32)
+        sobelc = np.array([[1, 2, 1]], np.float32)
+        Fx0 = np.zeros(shape = (self.image_Right.shape[0],self.image_Right.shape[1]-2))
+        Fx = np.zeros(shape = (Fx0.shape[0]-2,Fx0.shape[1]))
+        Fy0 = np.zeros(shape = (self.image_Right.shape[0],self.image_Right.shape[1]-2))
+        Fy = np.zeros(shape = (Fy0.shape[0]-2,Fx0.shape[1]))
+
+        for x in range(0, (self.image_Right.shape[0])):
+            for y in range(0, (self.image_Right.shape[1]-2)):
+                Fx0[x,y] = np.multiply(self.image_Right[x, y: y + 3], sobelr).sum()/8
+
+        for x in range(0, (Fx0.shape[0]-2)):
+            for y in range(0, (Fx0.shape[1])):
+                Fx[x,y] = np.multiply(Fx0[x:x+3,y], sobelc).sum()/8
+
+        for x in range(0, (self.image_Right.shape[0])):
+            for y in range(0, (self.image_Right.shape[1]-2)):
+                Fy0[x,y] = np.multiply(self.image_Right[x, y: y + 3], sobelc).sum()/8
+            
+        for x in range(0, (Fy0.shape[0]-2)):
+            for y in range(0, (Fy0.shape[1])):
+                Fy[x,y] = np.multiply(Fy0[x:x+3,y], sobelr).sum()/8
+        
+        sobel = np.sqrt(np.add(np.square(Fx), np.square(Fy)))
+        sobel = sobel / sobel.max()*255
+        theta = np.arctan2(Fx, Fy)
+
+        height, width = sobel.shape
+        Z = np.zeros((height, width), dtype=np.int32)
+        angle = theta * 180. / np.pi
+        angle[angle < 0] += 180
+
+        for i in range(1, height-1):
+            for j in range(1, width-1):
+                try:
+                    q = 255
+                    r = 255
+
+                    if (0 <= angle[i,j] < 22.5) or (157.5 <= angle[i,j] <= 180):
+                        q = sobel[i, j+1]
+                        r = sobel[i, j-1]
+                    elif (22.5 <= angle[i,j] < 67.5):
+                        q = sobel[i+1, j-1]
+                        r = sobel[i-1, j+1]
+                    elif (67.5 <= angle[i,j] < 112.5):
+                        q = sobel[i+1, j]
+                        r = sobel[i-1, j]
+                    elif (112.5 <= angle[i,j] < 157.5):
+                        q = sobel[i-1, j-1]
+                        r = sobel[i+1, j+1]
+                    
+                    if (sobel[i,j] >= q) and (sobel[i,j] >= r):
+                        Z[i,j] = sobel[i,j]
+                    else:
+                        Z[i,j] = 0
+                except IndexError as e:
+                    pass
+        
+        highThreshold = Z.max() * 0.09
+        lowThreshold = highThreshold * 0.05
+        M, N = Z.shape
+        res = np.zeros((M,N), dtype=np.int32)
+        weak = np.int32(25)
+        strong = np.int32(255)
+
+        strong_i, strong_j = np.where(Z >= highThreshold)
+        zeros_i, zeros_j = np.where(Z < lowThreshold)
+        weak_i, weak_j = np.where((Z <= highThreshold) & (Z >= lowThreshold))
+        res[strong_i, strong_j] = strong
+        res[weak_i, weak_j] = weak
+
+        H, W = res.shape
+        for i in range(1, H-1):
+            for j in range(1, W-1):
+                if (res[i,j] == 75):
+                    try:
+                        if ((res[i+1, j-1] == 100) or (res[i+1, j] == 100) or (res[i+1, j+1] == 100)
+                            or (res[i, j-1] == 100) or (res[i, j+1] == 100) or (res[i-1, j-1] == 100)
+                            or (res[i-1, j] == 100) or (res[i-1, j+1] == 100)): res[i, j] = 100
+                        else:
+                            res[i, j] = 0
+                    except IndexError as e:
+                        pass
+        
+        # set Right image
+        self.setRightImage(res, "convolution")
+        # set button normal
+        self.button_choise['state'] = NORMAL
 
 # main
 def main():
@@ -448,12 +618,16 @@ def main():
     imgProcessing.button_gaussianNoise = Button(frame_button, text="高斯雜訊", highlightbackground='#051636', command=imgProcessing.setGaussianNoiseSD, state="disabled")
     imgProcessing.button_waveletTrans = Button(frame_button, text="小波轉換", highlightbackground='#051636', command=imgProcessing.setWaveletLevel, state="disabled")
     imgProcessing.button_histogramEq = Button(frame_button, text="直方圖均化", highlightbackground='#051636', command=imgProcessing.histogramEqualization, state="disabled")
+    imgProcessing.button_convolution = Button(frame_button, text="平滑化", highlightbackground='#051636', command=imgProcessing.convolution, state="disabled")
+    imgProcessing.button_canny = Button(frame_button, text="邊緣偵測", highlightbackground='#051636', command=imgProcessing.canny, state="disabled")
     # position
     imgProcessing.button_choise.grid(row=1, column=1, pady=20, padx=5)
     imgProcessing.button_histogram.grid(row=1, column=2, pady=20, padx=5)
     imgProcessing.button_gaussianNoise.grid(row=1, column=3, pady=20, padx=5)
     imgProcessing.button_waveletTrans.grid(row=1, column=4, pady=20, padx=5)
     imgProcessing.button_histogramEq.grid(row=1, column=5, pady=20, padx=5)
+    imgProcessing.button_convolution.grid(row=1, column=6, pady=20, padx=5)
+    imgProcessing.button_canny.grid(row=1, column=7, pady=20, padx=5)
     # set Text
     text_before = Label(frame_Text, text = "輸入影像", bg="#051636", fg="green")
     text_before.grid(row=1, column=1, padx=195, pady=10)
