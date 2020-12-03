@@ -465,11 +465,11 @@ class ImgProcessing:
         self.button_convolution['state'] = DISABLED
         self.button_canny['state'] = DISABLED
         # create object
-        dialog = Dialog(window, '請輸入 mask 大小\n(例如：輸入 5，即為 5 x 5 pixels)')
+        dialog = Dialog(window, '請輸入 mask 大小，以奇數為主\n(例如：輸入 5，即為 5 x 5 pixels)')
         # wait window
         window.wait_window(dialog.top)
         # if answer is not none
-        if dialog.ans != "" and dialog.ans.isdigit():
+        if dialog.ans != "" and dialog.ans.isdigit() and int(dialog.ans) % 2 == 1:
             image = self.resize(self.convertColor(self.image_original, cv2.COLOR_BGR2GRAY), 480, 480)
             num = int(dialog.ans)
             kernel = num*num
@@ -496,6 +496,17 @@ class ImgProcessing:
             self.button_histogramEq['state'] = NORMAL
             self.button_convolution['state'] = NORMAL
             self.button_canny['state'] = DISABLED
+        elif int(dialog.ans) % 2 == 0:
+            # set button normal
+            self.button_choise['state'] = NORMAL
+            self.button_histogram['state'] = NORMAL
+            self.button_gaussianNoise['state'] = NORMAL
+            self.button_waveletTrans['state'] = NORMAL
+            self.button_histogramEq['state'] = NORMAL
+            self.button_convolution['state'] = NORMAL
+            self.button_canny['state'] = DISABLED
+            # show messagebox
+            messagebox.showinfo("警告", "請盡可能輸入奇數")
         else:
             # set button normal
             self.button_choise['state'] = NORMAL
