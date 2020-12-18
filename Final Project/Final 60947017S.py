@@ -648,11 +648,15 @@ class ImgProcessing:
         self.button_convolution['state'] = DISABLED
         self.button_canny['state'] = DISABLED
         self.button_ocr['state'] = DISABLED
-        image = self.resize(self.convertColor(self.image_original, cv2.COLOR_BGR2GRAY), 480, 480)
+        image = self.convertColor(self.image_original, cv2.COLOR_BGR2GRAY) # 灰階
+        image = cv2.convertScaleAbs(image, alpha = 1.8, beta = 0)
+        blur = cv2.GaussianBlur(image, (3, 3), 0)
+        ret, binary = cv2.threshold(blur, 190, 255, cv2.THRESH_TOZERO) # 二值化
         # set left image
-        self.setLeftImage(self.image_Left, "Gray")
+        # self.setLeftImage(self.image_Left, "Gray")
+        self.setLeftImage(self.resize(binary, 480, 480), "AlreadyGray")
         # set Right image
-        self.setRightImage(image, "OCR")
+        self.setRightImage(binary, "OCR")
 
 # main
 def main():
