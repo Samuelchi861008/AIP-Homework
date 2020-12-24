@@ -15,6 +15,8 @@
 |
 ├── Homework 5: Histogram equalization
 |
-└── Homework 6: Image smoothing and edge detection
+├── Homework 6: Image smoothing and edge detection
+|
+└── Final Project - Printed Character Recognition
 
 ```
