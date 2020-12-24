@@ -176,8 +176,8 @@ class ImgProcessing:
             self.canvasRight = FigureCanvasTkAgg(self.panel_RightHisEqu, self.frame_Right)
             self.canvasRight.get_tk_widget().grid(row=2, column=1, padx=15, pady=5)
         elif event == "OCR":
-            text = pytesseract.image_to_string(image, lang='eng')
-            self.panel_Right = Text(window, height=350)
+            text = pytesseract.image_to_string(image, lang='eng', config='--psm 6 --oem 1')
+            self.panel_Right = Text(window, height=350, font=("Helvetica", 40))
             self.panel_Right.pack(side="right", padx=10, pady=10)
             self.panel_Right.delete(1.0, END)
             self.panel_Right.insert(END, text)
@@ -649,12 +649,26 @@ class ImgProcessing:
         self.button_canny['state'] = DISABLED
         self.button_ocr['state'] = DISABLED
         image = self.convertColor(self.image_original, cv2.COLOR_BGR2GRAY) # 灰階
-        image = cv2.convertScaleAbs(image, alpha = 1.8, beta = 0)
-        blur = cv2.GaussianBlur(image, (3, 3), 0)
-        ret, binary = cv2.threshold(blur, 190, 255, cv2.THRESH_TOZERO) # 二值化
+        image = cv2.convertScaleAbs(image, alpha = 1.5, beta = 0) # 亮度
+        image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+        ret, binary = cv2.threshold(image, 228, 255, cv2.THRESH_BINARY) # 二值化
+
+        # 框取文字區域
+        region = []
+        contours, hierarchy = cv2.findContours(binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        for i in range(len(contours)):
+            cnt = contours[i]
+            rect = cv2.minAreaRect(cnt)
+            box = cv2.boxPoints(rect)
+            box = np.int0(box)
+            height = abs(box[0][1] - box[2][1])
+            width = abs(box[0][0] - box[2][0])
+            region.append(box)
+        for box in region:
+            cv2.drawContours(self.image_original, [box], -1, (0,0,255), 3, lineType=cv2.LINE_AA)
+
         # set left image
-        # self.setLeftImage(self.image_Left, "Gray")
-        self.setLeftImage(self.resize(binary, 480, 480), "AlreadyGray")
+        self.setLeftImage(self.image_original, "oral")
         # set Right image
         self.setRightImage(binary, "OCR")
 
